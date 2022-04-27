@@ -18,4 +18,9 @@ public class PayerService {
         return payerRepository.findAll();
     }
 
+    public Boolean getPayerByEmail(String email){
+        return payerRepository.selectExistsByEmail(email);
+
+    }
+
 }

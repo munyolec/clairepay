@@ -20,7 +20,7 @@ public class Merchant {
             strategy = GenerationType.SEQUENCE,
             generator = "merchant_sequence"
     )
-    private long merchantId;
+    private Long merchantId;
 
 
     private String apiKey;

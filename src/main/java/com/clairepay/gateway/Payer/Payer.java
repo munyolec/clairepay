@@ -3,6 +3,7 @@ package com.clairepay.gateway.Payer;
 
 import com.clairepay.gateway.PaymentMethod.PaymentMethod;
 import com.clairepay.gateway.Payments.Payments;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -24,7 +25,7 @@ public class Payer {
             strategy = GenerationType.SEQUENCE,
             generator = "payer_sequence"
     )
-    private long payerId;
+    private Long payerId;
     private String firstName;
     private String lastName;
 
@@ -36,10 +37,10 @@ public class Payer {
 
 
     @OneToMany(mappedBy="payer")
+    @JsonIgnore
     private Set<Payments> payments;
 
     public Payer(){
-
     }
 
     public Payer(String firstName, String lastName, String email, String phoneNumber) {

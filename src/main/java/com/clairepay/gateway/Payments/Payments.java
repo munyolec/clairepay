@@ -20,7 +20,7 @@ public class Payments {
             strategy = GenerationType.SEQUENCE,
             generator = "payments_sequence"
     )
-    private long paymentId;
+    private Long paymentId;
 
     @ManyToOne
     @JoinColumn(name="payer_Id", nullable=false)
@@ -28,13 +28,14 @@ public class Payments {
 
     @ManyToOne
     @JoinColumn(name="merchant_Id", nullable=false)
+
     private Merchant merchant;
+
     @ManyToOne
     @JoinColumn(name="method_Id", nullable=false)
     private PaymentMethod paymentMethod;
 
-
-    private String currency;
+    private String currency = "KES";
     private String amount;
 
     @NotNull
@@ -43,7 +44,6 @@ public class Payments {
     private Status status;
 
     public Payments(){
-
     }
 
 }

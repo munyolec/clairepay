@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface PayerRepository extends JpaRepository<Payer, Long> {
 
@@ -14,4 +16,6 @@ public interface PayerRepository extends JpaRepository<Payer, Long> {
             "WHERE p.email = ?1"
     )
     Boolean selectExistsByEmail(String email);
+    @Query("SELECT p FROM Payer p WHERE p.payerId = ?1")
+    Optional<Payer> findById(Long payerId);
 }

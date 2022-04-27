@@ -18,7 +18,7 @@ public class PaymentMethod {
             strategy = GenerationType.SEQUENCE,
             generator = "paymentMethod_sequence"
     )
-    private long methodId;
+    private Long methodId;
     private String methodName;
 
     @OneToMany(mappedBy="paymentMethod")
