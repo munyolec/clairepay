@@ -1,17 +1,25 @@
 package com.clairepay.gateway.Payments;
 
+import com.clairepay.gateway.CardDetails.CardDetails;
 import com.clairepay.gateway.Payer.PayerDTO;
-import com.clairepay.gateway.PaymentMethod.PaymentMethod;
-import com.clairepay.gateway.PaymentMethod.PaymentMethodDTO;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+
+import javax.validation.constraints.Null;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Data
 public class PaymentsDTO {
     private Long paymentId;
     private String currency;
     private String amount;
-    private PaymentMethodDTO paymentMethod;
+    private String paymentMethod;
     private PayerDTO payer;
+
+    @Null
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private CardDetails cardDetails;
 
 }
 

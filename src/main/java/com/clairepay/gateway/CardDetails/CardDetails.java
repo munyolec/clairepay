@@ -19,13 +19,15 @@ public class CardDetails {
     )
     public String cardNumber;
     @NotNull
-    public String month;
+    public String expiryDate;
     @NotNull
-    public String year;
-    @NotNull
-    public String cvv;
 
     public CardDetails(){
 
+    }
+
+    public CardDetails(String cardNumber, String expiryDate) {
+        this.cardNumber = cardNumber;
+        this.expiryDate = expiryDate;
     }
 }

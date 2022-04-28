@@ -1,5 +1,6 @@
 package com.clairepay.gateway.Payments;
 
+import com.clairepay.gateway.CardDetails.CardDetails;
 import com.clairepay.gateway.Merchant.Merchant;
 import com.clairepay.gateway.Merchant.MerchantRepository;
 import com.clairepay.gateway.Payer.Payer;
@@ -42,8 +43,13 @@ public class PaymentService {
         paymentsDTO.setPaymentId(payment.getPaymentId());
         paymentsDTO.setCurrency(payment.getCurrency());
         paymentsDTO.setAmount(payment.getAmount());
-        paymentsDTO.setPaymentMethod(payment.getPaymentMethod().convertPayerMethodEntityToDTO());
+        paymentsDTO.setPaymentMethod(payment.getPaymentMethod().getMethodName());
         paymentsDTO.setPayer(payment.getPayer().convertPayerEntityToDTO());
+
+        if((paymentsDTO.getPaymentMethod()).equals("Card")){
+            CardDetails card = new CardDetails("391310332842", "07/23");
+            paymentsDTO.setCardDetails(card);
+        }
         return paymentsDTO;
 
     }
