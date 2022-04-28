@@ -1,5 +1,6 @@
 package com.clairepay.gateway.Payer;
 
+import com.clairepay.gateway.Payments.Payments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,12 +21,16 @@ public class PayerController {
     }
 
     @GetMapping
-    public List<Payer> getAllPayers() {
+    public List<PayerDTO> getAllPayers() {
         return payerService.getAllPayers();
     }
 
     @GetMapping(path = "/{email}")
     public Boolean getPayer(@PathVariable("email") String email) {
         return payerService.getPayerByEmail(email);
+    }
+    @GetMapping(path = "/{email}/payments")
+    public List<Payments> getPayments(@PathVariable("email") String email) {
+        return payerService.getAllPayments();
     }
 }

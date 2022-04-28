@@ -1,16 +1,21 @@
 package com.clairepay.gateway.Merchant;
 
 import com.clairepay.gateway.Payments.Payments;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Entity
 @Table
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,property="merchantId")
+
 public class Merchant {
     @Id
     @SequenceGenerator(name = "merchant_sequence",
@@ -33,7 +38,8 @@ public class Merchant {
     private Integer merchantBalance;
 
     @OneToMany(mappedBy="merchant")
-    private Set<Payments> payments;
+    //@JsonManagedReference
+    private List<Payments> payments;
 
     public Merchant() {
     }

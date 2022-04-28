@@ -1,21 +1,23 @@
 package com.clairepay.gateway.Payer;
 
 
-import com.clairepay.gateway.PaymentMethod.PaymentMethod;
 import com.clairepay.gateway.Payments.Payments;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
+
 import javax.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.Set;
+
+import java.util.List;
 
 @Data
 @Entity
 @Table
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,property="payerId")
 public class Payer {
     @Id
     @SequenceGenerator(name = "payer_sequence",
@@ -37,8 +39,8 @@ public class Payer {
 
 
     @OneToMany(mappedBy="payer")
-    @JsonIgnore
-    private Set<Payments> payments;
+//    @JsonIgnore
+    private List<Payments> payments;
 
     public Payer(){
     }
@@ -50,4 +52,13 @@ public class Payer {
         this.phoneNumber = phoneNumber;
 
     }
+    public PayerDTO convertPayerEntityToDTO() {
+        PayerDTO payerDTO = new PayerDTO();
+        payerDTO.setFirstName(this.getFirstName());
+        payerDTO.setLastName(this.getLastName());
+        payerDTO.setPhoneNumber(this.getPhoneNumber());
+        payerDTO.setEmail(this.getEmail());
+        return payerDTO;
+    }
+
 }
