@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "api/v1/clairepay/payments")
@@ -25,7 +26,14 @@ public class PaymentsController {
         return service.getAllPayments();
     }
 
-    @PutMapping(path = "/makepayment/{payerId}/{paymentMethodId}/{merchantId}/{amount}")
+    @GetMapping(path = "/{payerId}/payments")
+    public List<PaymentsDTO> getPayments(@PathVariable("payerId") Long payerId) {
+        return service.getPayerPayment(payerId);
+    }
+
+
+
+    @PutMapping(path = "/makePayment/payer/{payerId}/method/{paymentMethodId}/merchant/{merchantId}/{amount}")
     public void makePayment(
             @PathVariable("payerId") Long payer,
             @PathVariable("paymentMethodId") Long paymentMethodId,

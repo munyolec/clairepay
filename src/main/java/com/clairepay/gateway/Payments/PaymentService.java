@@ -4,7 +4,6 @@ import com.clairepay.gateway.CardDetails.CardDetails;
 import com.clairepay.gateway.Merchant.Merchant;
 import com.clairepay.gateway.Merchant.MerchantRepository;
 import com.clairepay.gateway.Payer.Payer;
-import com.clairepay.gateway.Payer.PayerDTO;
 import com.clairepay.gateway.Payer.PayerRepository;
 import com.clairepay.gateway.PaymentMethod.PaymentMethod;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,5 +76,12 @@ public class PaymentService {
 
         paymentsRepository.save(payment);
 
+    }
+
+    public List<PaymentsDTO> getPayerPayment(Long payerId) {
+        return paymentsRepository.findByPayerId(payerId)
+                .stream()
+                .map(this::convertEntityToDTO)
+                .collect(Collectors.toList());
     }
 }

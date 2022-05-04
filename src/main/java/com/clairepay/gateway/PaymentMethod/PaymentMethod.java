@@ -27,7 +27,6 @@ public class PaymentMethod {
     private String methodName;
 
     @OneToMany(mappedBy="paymentMethod")
-    //@JsonManagedReference
     private List<Payments> payments;
 
     public PaymentMethod() {}

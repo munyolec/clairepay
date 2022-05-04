@@ -29,8 +29,5 @@ public class PayerController {
     public Boolean getPayer(@PathVariable("email") String email) {
         return payerService.getPayerByEmail(email);
     }
-    @GetMapping(path = "/{email}/payments")
-    public List<Payments> getPayments(@PathVariable("email") String email) {
-        return payerService.getAllPayments();
-    }
+
 }

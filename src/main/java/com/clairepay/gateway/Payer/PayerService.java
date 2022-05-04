@@ -41,8 +41,5 @@ public class PayerService {
 
     }
 
-    public List<Payments> getAllPayments() {
-         return payerRepository.findAllPayments();
-    }
 
 }

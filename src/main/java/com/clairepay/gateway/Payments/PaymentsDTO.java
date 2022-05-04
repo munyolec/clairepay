@@ -7,8 +7,6 @@ import lombok.Data;
 
 import javax.validation.constraints.Null;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-
 @Data
 public class PaymentsDTO {
     private Long paymentId;
