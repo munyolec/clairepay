@@ -9,7 +9,6 @@ import com.clairepay.gateway.PaymentMethod.PaymentMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.beans.Transient;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,7 +28,9 @@ public class PaymentService {
         this.paymentsRepository = paymentsRepository;
     }
 
-
+    /**
+     * @return all payments
+     */
     public List<PaymentsDTO> getAllPayments() {
         return paymentsRepository.findAll()
                 .stream()
@@ -37,6 +38,9 @@ public class PaymentService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * @return paymentsDTO
+     */
     private PaymentsDTO convertEntityToDTO(Payments payment) {
         PaymentsDTO paymentsDTO = new PaymentsDTO();
         paymentsDTO.setPaymentId(payment.getPaymentId());
@@ -53,30 +57,41 @@ public class PaymentService {
 
     }
 
-@Transient
-    public void createPayment(Payer payer, Merchant merchant, PaymentMethod paymentMethod, String amount){
+
+    /**
+     * make a payment
+     * @param payer
+     * @param merchant
+     * @param paymentMethod
+     * @param amount
+     */
+
+
+    public void createPayment(Payer payer, Merchant merchant, PaymentMethod paymentMethod, Integer amount){
         Optional<Payer> payingCustomer = payerRepository.findById(payer.getPayerId());
         Optional<Merchant> receivingMerchant = merchantRepository.findById(merchant.getMerchantId());
         Payments payment = new Payments();
-        if ((payingCustomer.isPresent()) ==false ) {
+        if ((payingCustomer.isPresent()) == false ) {
             throw new IllegalArgumentException("payer not found");
         }
-        if ((receivingMerchant.isPresent()) ==false ) {
+        if ((receivingMerchant.isPresent()) == false ) {
             throw new IllegalArgumentException("merchant not found");
         }
             payer = payingCustomer.get();
             merchant= receivingMerchant.get();
-           String phone = payingCustomer.get().getPhoneNumber();
            payment.setPayer(payer);
            payment.setMerchant(merchant);
            payment.setPaymentMethod(paymentMethod);
-           payment.setAmount(amount);
+           payment.setAmount(String.valueOf(amount));
+           merchant.setMerchantBalance(merchant.getMerchantBalance() + amount);
            payment.setStatus(Status.PENDING);
-
-
         paymentsRepository.save(payment);
 
     }
+
+    /**
+     * return payments based on payerID
+     */
 
     public List<PaymentsDTO> getPayerPayment(Long payerId) {
         return paymentsRepository.findByPayerId(payerId)
@@ -84,4 +99,5 @@ public class PaymentService {
                 .map(this::convertEntityToDTO)
                 .collect(Collectors.toList());
     }
+
 }

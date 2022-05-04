@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "api/v1/clairepay/payments")
@@ -38,7 +37,7 @@ public class PaymentsController {
             @PathVariable("payerId") Long payer,
             @PathVariable("paymentMethodId") Long paymentMethodId,
             @PathVariable("merchantId") Long merchant,
-            @PathVariable("amount") String amount
+            @PathVariable("amount") Integer amount
     ){
         Payer p = new Payer();
         p.setPayerId(payer);
@@ -47,7 +46,7 @@ public class PaymentsController {
         Merchant m = new Merchant();
         m.setMerchantId(merchant);
         Payments payment = new Payments();
-        payment.setAmount(amount);
+        payment.setAmount(String.valueOf(amount));
         service.createPayment(p,m,pm,amount);
     }
 }
