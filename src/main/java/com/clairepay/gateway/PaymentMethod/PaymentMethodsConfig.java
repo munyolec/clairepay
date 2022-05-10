@@ -20,12 +20,12 @@ public class PaymentMethodsConfig {
 
             );
 
-            PaymentMethod Mpesa = new PaymentMethod(
+            PaymentMethod mpesa = new PaymentMethod(
                     "MobileMoney"
 
             );
 
-            repository.saveAll(List.of(card, Mpesa));
+            repository.saveAll(List.of(card, mpesa));
         };
     }
 }

@@ -21,8 +21,14 @@ public class MerchantConfig {
                     "malek@gmail.com",
                     "0700256345"
             );
+            Merchant two = new Merchant(
+                    "Walter",
+                    "Richards",
+                    "richwalt@gmail.com",
+                    "0700256345"
+            );
 
-            repository.saveAll(List.of(one));
+            repository.saveAll(List.of(one, two));
         };
     }
 

@@ -12,7 +12,6 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "api/v1/clairepay/payments")
 public class PaymentsController {
-
     private final PaymentService service;
 
     @Autowired
@@ -30,23 +29,27 @@ public class PaymentsController {
         return service.getPayerPayment(payerId);
     }
 
-
-
     @PutMapping(path = "/makePayment/payer/{payerId}/method/{paymentMethodId}/merchant/{merchantId}/{amount}")
+    @ResponseBody
     public void makePayment(
             @PathVariable("payerId") Long payer,
             @PathVariable("paymentMethodId") Long paymentMethodId,
             @PathVariable("merchantId") Long merchant,
             @PathVariable("amount") Integer amount
     ){
-        Payer p = new Payer();
-        p.setPayerId(payer);
-        PaymentMethod pm = new PaymentMethod();
-        pm.setMethodId(paymentMethodId);
-        Merchant m = new Merchant();
-        m.setMerchantId(merchant);
+        Payer newPayer = new Payer();
+        newPayer.setPayerId(payer);
+
+        PaymentMethod newPaymentMethod = new PaymentMethod();
+        newPaymentMethod.setMethodId(paymentMethodId);
+
+        Merchant newMerchant = new Merchant();
+        newMerchant.setMerchantId(merchant);
+
         Payments payment = new Payments();
-        payment.setAmount(String.valueOf(amount));
-        service.createPayment(p,m,pm,amount);
+        payment.setAmount(amount);
+
+        service.createPayment(newPayer,newMerchant,newPaymentMethod,amount);
     }
+
 }

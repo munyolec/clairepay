@@ -2,7 +2,6 @@ package com.clairepay.gateway.Payments;
 
 import com.clairepay.gateway.Merchant.Merchant;
 import com.clairepay.gateway.Payer.Payer;
-import com.clairepay.gateway.Payer.PayerDTO;
 import com.clairepay.gateway.PaymentMethod.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -33,23 +32,30 @@ public class Payments {
     private Payer payer;
 
     @ManyToOne
-//    @JsonBackReference
     @JoinColumn(name = "merchant_Id", nullable = false)
     private Merchant merchant;
 
     @ManyToOne
-//    @JsonBackReference
     @JoinColumn(name = "method_Id", nullable = false)
     private PaymentMethod paymentMethod;
 
     private String currency = "KES";
-    private String amount;
+    private Integer amount;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status;
-
+    private PaymentsStatus status;
     public Payments() {
+    }
+
+    public Payments(Long paymentId, Payer payer, Merchant merchant, PaymentMethod paymentMethod, String currency, Integer amount, PaymentsStatus status) {
+        this.paymentId = paymentId;
+        this.payer = payer;
+        this.merchant = merchant;
+        this.paymentMethod = paymentMethod;
+        this.currency = currency;
+        this.amount = amount;
+        this.status = status;
     }
 }

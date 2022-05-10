@@ -3,7 +3,6 @@ package com.clairepay.gateway.Payer;
 
 import com.clairepay.gateway.Payments.Payments;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -38,8 +37,7 @@ public class Payer {
     private String phoneNumber;
 
 
-    @OneToMany(mappedBy="payer")
-//    @JsonIgnore
+    @OneToMany(mappedBy="payer",fetch = FetchType.LAZY)
     private List<Payments> payments;
 
     public Payer(){
@@ -60,5 +58,6 @@ public class Payer {
         payerDTO.setEmail(this.getEmail());
         return payerDTO;
     }
+
 
 }

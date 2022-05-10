@@ -45,7 +45,7 @@ public class PaymentService {
         PaymentsDTO paymentsDTO = new PaymentsDTO();
         paymentsDTO.setPaymentId(payment.getPaymentId());
         paymentsDTO.setCurrency(payment.getCurrency());
-        paymentsDTO.setAmount(payment.getAmount());
+        paymentsDTO.setAmount(String.valueOf(payment.getAmount()));
         paymentsDTO.setPaymentMethod(payment.getPaymentMethod().getMethodName());
         paymentsDTO.setPayer(payment.getPayer().convertPayerEntityToDTO());
 
@@ -54,12 +54,10 @@ public class PaymentService {
             paymentsDTO.setCardDetails(card);
         }
         return paymentsDTO;
-
     }
-
-
     /**
      * make a payment
+     *
      * @param payer
      * @param merchant
      * @param paymentMethod
@@ -70,22 +68,23 @@ public class PaymentService {
     public void createPayment(Payer payer, Merchant merchant, PaymentMethod paymentMethod, Integer amount){
         Optional<Payer> payingCustomer = payerRepository.findById(payer.getPayerId());
         Optional<Merchant> receivingMerchant = merchantRepository.findById(merchant.getMerchantId());
+
         Payments payment = new Payments();
-        if ((payingCustomer.isPresent()) == false ) {
+        if (payingCustomer.isEmpty()) {
             throw new IllegalArgumentException("payer not found");
         }
-        if ((receivingMerchant.isPresent()) == false ) {
+        if (receivingMerchant.isEmpty()) {
             throw new IllegalArgumentException("merchant not found");
         }
             payer = payingCustomer.get();
             merchant= receivingMerchant.get();
-           payment.setPayer(payer);
-           payment.setMerchant(merchant);
-           payment.setPaymentMethod(paymentMethod);
-           payment.setAmount(String.valueOf(amount));
-           merchant.setMerchantBalance(merchant.getMerchantBalance() + amount);
-           payment.setStatus(Status.PENDING);
-        paymentsRepository.save(payment);
+            payment.setPayer(payer);
+            payment.setMerchant(merchant);
+            payment.setPaymentMethod(paymentMethod);
+            payment.setAmount(amount);
+            merchant.setMerchantBalance(merchant.getMerchantBalance() + amount);
+            payment.setStatus(PaymentsStatus.PENDING);
+            paymentsRepository.save(payment);
 
     }
 
@@ -100,4 +99,9 @@ public class PaymentService {
                 .collect(Collectors.toList());
     }
 
+    public void createPayment2(Payments payment) {
+        payment.setStatus(PaymentsStatus.PENDING);
+        paymentsRepository.save(payment);
+
+    }
 }

@@ -2,7 +2,6 @@ package com.clairepay.gateway.Merchant;
 
 import com.clairepay.gateway.Payments.Payments;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 
@@ -10,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -27,8 +27,8 @@ public class Merchant {
     )
     private Long merchantId;
 
-
-    private String apiKey;
+//    private String apiKey;
+    private UUID apiKey = UUID.randomUUID();
     private String firstName;
     private String lastName;
     @NotNull
@@ -38,7 +38,6 @@ public class Merchant {
     private Integer merchantBalance;
 
     @OneToMany(mappedBy="merchant")
-    //@JsonManagedReference
     private List<Payments> payments;
 
     public Merchant() {
@@ -53,4 +52,7 @@ public class Merchant {
         this.merchantBalance=0;
 
     }
+
+
+
 }

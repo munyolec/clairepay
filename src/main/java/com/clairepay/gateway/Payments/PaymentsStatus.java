@@ -1,6 +1,6 @@
 package com.clairepay.gateway.Payments;
 
-public enum Status {
+public enum PaymentsStatus {
     SUCCESS,
     PENDING,
     FAILED

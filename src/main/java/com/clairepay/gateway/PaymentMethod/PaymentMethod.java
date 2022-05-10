@@ -35,10 +35,4 @@ public class PaymentMethod {
         this.methodName = methodName;
     }
 
-    public PaymentMethodDTO convertPayerMethodEntityToDTO() {
-        PaymentMethodDTO paymentMethodDTO = new PaymentMethodDTO();
-        paymentMethodDTO.setMethodId(this.getMethodId());
-        paymentMethodDTO.setMethodName(this.getMethodName());
-        return paymentMethodDTO;
-    }
 }
