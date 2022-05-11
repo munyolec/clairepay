@@ -10,4 +10,7 @@ public interface PaymentsRepository extends JpaRepository<Payments, Long> {
 
     @Query("SELECT p FROM Payments p WHERE p.payer.payerId = ?1")
     Collection<Payments> findByPayerId(Long payerId);
+
+    @Query("SELECT p FROM Payments p WHERE p.merchant.apiKey= ?1")
+    Collection<Payments> findByPayerApiKey(String apiKey);
 }

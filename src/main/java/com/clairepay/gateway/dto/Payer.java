@@ -1,15 +1,12 @@
-package com.clairepay.gateway.Payer;
+package com.clairepay.gateway.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 @Data
-public class PayerDTO {
+public class Payer {
     private String firstName;
     private String lastName;
     private String phoneNumber;
     private String email;
 
-
 }
-

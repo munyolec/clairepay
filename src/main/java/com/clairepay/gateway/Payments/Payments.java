@@ -26,12 +26,10 @@ public class Payments {
     )
     private Long paymentId;
 
-    @ManyToOne
-//    @JsonBackReference
+    @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name = "payer_Id", nullable = false)
     private Payer payer;
-
-    @ManyToOne
+    @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name = "merchant_Id", nullable = false)
     private Merchant merchant;
 
@@ -42,9 +40,7 @@ public class Payments {
     private String currency = "KES";
     private Integer amount;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private PaymentsStatus status;
     public Payments() {
     }

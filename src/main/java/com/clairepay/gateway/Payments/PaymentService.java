@@ -9,6 +9,7 @@ import com.clairepay.gateway.PaymentMethod.PaymentMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -99,9 +100,18 @@ public class PaymentService {
                 .collect(Collectors.toList());
     }
 
-    public void createPayment2(Payments payment) {
+    public void createPayment2(Payments payment){
+        Integer merchantBalance = payment.getMerchant().getMerchantBalance();
+        payment.getMerchant().setMerchantBalance(merchantBalance + payment.getAmount());
         payment.setStatus(PaymentsStatus.PENDING);
         paymentsRepository.save(payment);
 
+    }
+
+    public List<PaymentsDTO> getMerchantPayments(String apiKey) {
+        return paymentsRepository.findByPayerApiKey(apiKey)
+                .stream()
+                .map(this::convertEntityToDTO)
+                .collect(Collectors.toList());
     }
 }

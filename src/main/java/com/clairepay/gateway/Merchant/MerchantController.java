@@ -2,17 +2,18 @@ package com.clairepay.gateway.Merchant;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/clairepay/merchants")
 public class MerchantController {
     private final MerchantService merchantService;
+    private Long merchantId;
+    private String apiKey;
 
     @Autowired
     public MerchantController(MerchantService merchantService) {
@@ -22,13 +23,21 @@ public class MerchantController {
     @GetMapping()
     public List<MerchantDTO> getAllMerchants(){
         return merchantService.getMerchantList();
-
     }
 
     @GetMapping(path="/{merchantId}")
     public List<MerchantDTO> getMerchant(@PathVariable Long merchantId){
        return merchantService.getMerchant(merchantId);
     }
+
+    @GetMapping(path="/paymentFor/{merchantId}")
+    public Optional<Merchant> getMerchantPayments(
+            @PathVariable Long merchantId,
+            @RequestHeader("apiKey") String apiKey){
+        return merchantService.getMerchantPayments(apiKey);
+    }
+
+
 
 
 

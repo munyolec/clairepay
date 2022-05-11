@@ -6,18 +6,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface MerchantRepository extends JpaRepository<Merchant, Long> {
 
-    @Query("" +
-            "SELECT CASE WHEN COUNT(m) > 0 THEN " +
-            "TRUE ELSE FALSE END " +
-            "FROM Merchant m " +
-            "WHERE m.apiKey = ?1"
-    )
-    Boolean selectExistsByApiKey(String apiKey);
+
+
+    Optional<Merchant> findByApiKey(String apiKey);
 
     @Query("SELECT m FROM Merchant m WHERE m.merchantId = ?1")
     Optional<Merchant> findById(Long merchantId);
+
+    Optional<Merchant> findByEmail(String email);
 }

@@ -18,10 +18,13 @@ public interface PayerRepository extends JpaRepository<Payer, Long> {
             "FROM Payer p " +
             "WHERE p.email = ?1"
     )
+
     Boolean selectExistsByEmail(String email);
 
     @Query("SELECT p FROM Payer p WHERE p.payerId = ?1")
     Optional<Payer> findById(Long payerId);
+
+    Optional<Payer> findByEmail(String email);
 
 
 }

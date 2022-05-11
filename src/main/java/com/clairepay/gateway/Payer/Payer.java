@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import java.util.List;
@@ -27,15 +28,19 @@ public class Payer {
             generator = "payer_sequence"
     )
     private Long payerId;
+    @NotNull
     private String firstName;
+    @NotNull
     private String lastName;
 
     @Email
-    @Column(nullable = false, unique = true)
+    @UniqueEmail
+    @Column(unique = true)
+    @NotNull
     private String email;
     @Size(min=10)
+    @NotNull
     private String phoneNumber;
-
 
     @OneToMany(mappedBy="payer",fetch = FetchType.LAZY)
     private List<Payments> payments;

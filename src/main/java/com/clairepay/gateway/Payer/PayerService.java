@@ -1,7 +1,5 @@
 package com.clairepay.gateway.Payer;
 
-import com.clairepay.gateway.Payments.Payments;
-import com.clairepay.gateway.Payments.PaymentsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,14 +30,14 @@ public class PayerService {
         payerDTO.setPhoneNumber(payer.getPhoneNumber());
         payerDTO.setEmail(payer.getEmail());
         return payerDTO;
-
     }
 
 
     public Boolean getPayerByEmail(String email){
         return payerRepository.selectExistsByEmail(email);
-
     }
 
-
+    public Payer addNewPayer(Payer payer) {
+         return this.payerRepository.save(payer);
+    }
 }

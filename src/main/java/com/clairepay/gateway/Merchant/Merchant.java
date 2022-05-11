@@ -1,5 +1,6 @@
 package com.clairepay.gateway.Merchant;
 
+import com.clairepay.gateway.Payer.UniqueEmail;
 import com.clairepay.gateway.Payments.Payments;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -28,10 +29,11 @@ public class Merchant {
     private Long merchantId;
 
 //    private String apiKey;
-    private UUID apiKey = UUID.randomUUID();
+    private String apiKey = UUID.randomUUID().toString();
     private String firstName;
     private String lastName;
     @NotNull
+//    @UniqueEmail
     private String email;
     @Size(min=10)
     private String phoneNumber;
