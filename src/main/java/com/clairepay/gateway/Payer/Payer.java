@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import java.util.List;
@@ -28,9 +29,9 @@ public class Payer {
             generator = "payer_sequence"
     )
     private Long payerId;
-    @NotNull
+    @NotNull(message="should not be null")
     private String firstName;
-    @NotNull
+    @NotNull(message="should not be null")
     private String lastName;
 
     @Email
@@ -40,6 +41,7 @@ public class Payer {
     private String email;
     @Size(min=10)
     @NotNull
+    @Pattern(regexp="^\\d{10}$")
     private String phoneNumber;
 
     @OneToMany(mappedBy="payer",fetch = FetchType.LAZY)

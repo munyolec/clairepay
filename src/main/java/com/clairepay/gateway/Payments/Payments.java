@@ -34,7 +34,7 @@ public class Payments {
     private Merchant merchant;
 
     @ManyToOne
-    @JoinColumn(name = "method_Id", nullable = false)
+    @JoinColumn(name = "method_Id")
     private PaymentMethod paymentMethod;
 
     private String currency = "KES";

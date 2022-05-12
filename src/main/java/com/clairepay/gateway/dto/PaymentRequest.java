@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
 @Data
@@ -18,8 +19,8 @@ public class PaymentRequest {
     private String currency;
     private Integer amount;
     private String paymentMethod;
+    @NotNull(message = "payer should not be null")
     private Payer payer;
-    private Merchant merchant;
     private CardDetails card;
 
 }

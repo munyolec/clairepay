@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -69,55 +70,62 @@ public class PaymentsController {
 //        service.createPayment(newPayer,newMerchant,newPaymentMethod,amount);
 //    }
 
-    @PostMapping(value ="postPayment/{paymentMethod}")
+    @PostMapping(value ="postPayment")
     public PaymentResponse processPay(@Valid @RequestBody PaymentRequest paymentRequest,
-                                      @PathVariable("paymentMethod") String paymentMethod,
                                       @RequestHeader("apiKey") String apiKey){
         log.info("Received request::: " + paymentRequest);
         Payments payment = new Payments();
         PaymentMethod newPaymentMethod = new PaymentMethod();
+        PaymentResponse response = new PaymentResponse();
+
+        response.setReferenceId(paymentRequest.getReferenceId());
+
+        //check if merchant is registered
+        if(merchantRepository.findByApiKey(apiKey).isPresent()){
+            payment.setMerchant(merchantRepository.findByApiKey(apiKey).get());
+        }
+        else{
+            response.setResponse_code("1");
+            response.setResponse_description("merchant not found");
+            return(response);
+        }
+
+        //set payment method and validate
+        if(paymentRequest.getPaymentMethod().equalsIgnoreCase("mpesa")){
+           newPaymentMethod.setMethodId(2L);
+           payment.setPaymentMethod(newPaymentMethod);
+        }else if(paymentRequest.getPaymentMethod().equalsIgnoreCase("card")){
+            newPaymentMethod.setMethodId(1L);
+            payment.setPaymentMethod(newPaymentMethod);
+        }else{
+            response.setResponse_code("2");
+            response.setResponse_description("invalid payment method");
+        }
 
         //check if payer exists in database,get email, if new email value create a new payer
         String payerEmail =paymentRequest.getPayer().getEmail();
-
-        if(payerRepository.findByEmail(payerEmail).isPresent()){
+        if(payerRepository.findByEmail(payerEmail).isPresent() ){
             paymentRequest.setPayer(payerRepository.findByEmail(payerEmail).get());
         }
         else{
             paymentRequest.setPayer(paymentRequest.getPayer());
         }
-
         payment.setPayer(paymentRequest.getPayer());
+
+
 
         //TODO
         //check for card details if card was passed as payment method
-
-        paymentRequest.setPaymentMethod(paymentMethod);
-
-        if((paymentRequest.getPaymentMethod()).equalsIgnoreCase("Card")){
-            CardDetails card = new CardDetails("391310332842", "07/23");
-            paymentRequest.setCard(card);
-        }
-
-        if(paymentMethod.equals("card")){
-            newPaymentMethod.setMethodId(1L);
-            payment.setPaymentMethod(newPaymentMethod);
-        }
-        else if (paymentMethod.equals("mpesa")){
-            newPaymentMethod.setMethodId(2L);
-            payment.setPaymentMethod(newPaymentMethod);
-        }
-        PaymentResponse response = new PaymentResponse();
-        response.setReferenceId(paymentRequest.getReferenceId());
-
-        payment.setTransactionId(response.getTransaction_id());
-
         payment.setAmount(paymentRequest.getAmount());
 
+        if((response.getResponse_code() != "1") && (response.getResponse_code() != "2")){
+            response.setResponse_code("3");
+            response.setResponse_description("payment successful");
+            payment.setTransactionId(response.getTransaction_id());
+        }
+
         //post payment to database
-        service.createPayment2(payment, apiKey);
-
-
+        service.createPayment2(payment);
 
         return response;
     }
