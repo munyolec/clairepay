@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 
 @Slf4j
@@ -44,32 +42,6 @@ public class PaymentsController {
         return service.getPayerPayment(payerId);
     }
 
-    /**
-     * create payment
-     */
-//    @PutMapping(path = "/makePayment/payer/{payerId}/method/{paymentMethodId}/merchant/{merchantId}/{amount}")
-//    @ResponseBody
-//    public void makePayment(
-//            @PathVariable("payerId") Long payer,
-//            @PathVariable("paymentMethodId") Long paymentMethodId,
-//            @PathVariable("merchantId") Long merchant,
-//            @PathVariable("amount") Integer amount
-//    ){
-//        Payer newPayer = new Payer();
-//        newPayer.setPayerId(payer);
-//
-//        PaymentMethod newPaymentMethod = new PaymentMethod();
-//        newPaymentMethod.setMethodId(paymentMethodId);
-//
-//        Merchant newMerchant = new Merchant();
-//        newMerchant.setMerchantId(merchant);
-//
-//        Payments payment = new Payments();
-//        payment.setAmount(amount);
-//
-//        service.createPayment(newPayer,newMerchant,newPaymentMethod,amount);
-//    }
-
     @PostMapping(value ="postPayment")
     public PaymentResponse processPay(@Valid @RequestBody PaymentRequest paymentRequest,
                                       @RequestHeader("apiKey") String apiKey){
@@ -82,13 +54,17 @@ public class PaymentsController {
 
         //check if merchant is registered
         if(merchantRepository.findByApiKey(apiKey).isPresent()){
-            payment.setMerchant(merchantRepository.findByApiKey(apiKey).get());
+            Merchant merchantFound = merchantRepository.findByApiKey(apiKey).get();
+            payment.setMerchant(merchantFound);
+            merchantFound.setMerchantBalance((merchantFound.getMerchantBalance() + paymentRequest.getAmount()));
         }
         else{
             response.setResponse_code("1");
-            response.setResponse_description("merchant not found");
+            response.setResponse_description("wrong merchant apiKey");
             return(response);
         }
+
+
 
         //set payment method and validate
         if(paymentRequest.getPaymentMethod().equalsIgnoreCase("mpesa")){
@@ -97,7 +73,25 @@ public class PaymentsController {
         }else if(paymentRequest.getPaymentMethod().equalsIgnoreCase("card")){
             newPaymentMethod.setMethodId(1L);
             payment.setPaymentMethod(newPaymentMethod);
-        }else{
+
+            //setting card details
+            if(paymentRequest.getCard() != null) {
+                String cardNumber = paymentRequest.getCard().getCardNumber();
+                String expiry = paymentRequest.getCard().getExpiryDate();
+                String cvv = paymentRequest.getCard().getCvv();
+                CardDetails card = new CardDetails(cardNumber, expiry, cvv);
+                paymentRequest.setCard(card);
+            }
+            //check that card details have been provided
+           if(paymentRequest.getCard() == null){
+               response.setResponse_code("4");
+               response.setResponse_description("card details absent");
+               return(response);
+
+           }
+
+
+        } else {
             response.setResponse_code("2");
             response.setResponse_description("invalid payment method");
         }
@@ -116,9 +110,15 @@ public class PaymentsController {
 
         //TODO
         //check for card details if card was passed as payment method
+
+
+
+
+
+
         payment.setAmount(paymentRequest.getAmount());
 
-        if((response.getResponse_code() != "1") && (response.getResponse_code() != "2")){
+        if((response.getResponse_code() != "1") && (response.getResponse_code() != "2") && (response.getResponse_code() != "4")){
             response.setResponse_code("3");
             response.setResponse_description("payment successful");
             payment.setTransactionId(response.getTransaction_id());

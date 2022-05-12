@@ -50,44 +50,12 @@ public class PaymentService {
         paymentsDTO.setAmount(String.valueOf(payment.getAmount()));
         paymentsDTO.setPaymentMethod(payment.getPaymentMethod().getMethodName());
         paymentsDTO.setPayer(payment.getPayer().convertPayerEntityToDTO());
-
-        if((paymentsDTO.getPaymentMethod()).equals("Card")){
-            CardDetails card = new CardDetails("391310332842", "07/23");
-            paymentsDTO.setCardDetails(card);
-        }
+//        if((paymentsDTO.getPaymentMethod()).equals("Card")){
+//            CardDetails card = new CardDetails("391310332842", "07/23");
+//            paymentsDTO.setCardDetails(card);
+//        }
         return paymentsDTO;
     }
-    /**
-     * make a payment
-     *
-     * @param payer
-     * @param merchant
-     * @param paymentMethod
-     * @param amount
-     */
-
-//    public void createPayment(Payer payer, Merchant merchant, PaymentMethod paymentMethod, Integer amount){
-//        Optional<Payer> payingCustomer = payerRepository.findById(payer.getPayerId());
-//        Optional<Merchant> receivingMerchant = merchantRepository.findById(merchant.getMerchantId());
-//
-//        Payments payment = new Payments();
-//        if (payingCustomer.isEmpty()) {
-//            throw new IllegalArgumentException("payer not found");
-//        }
-//        if (receivingMerchant.isEmpty()) {
-//            throw new IllegalArgumentException("merchant not found");
-//        }
-//            payer = payingCustomer.get();
-//            merchant= receivingMerchant.get();
-//            payment.setPayer(payer);
-//            payment.setMerchant(merchant);
-//            payment.setPaymentMethod(paymentMethod);
-//            payment.setAmount(amount);
-//            merchant.setMerchantBalance(merchant.getMerchantBalance() + amount);
-//            payment.setStatus(PaymentsStatus.PENDING);
-//            paymentsRepository.save(payment);
-//
-//    }
 
     /**
      * return payments based on payerID
@@ -101,20 +69,7 @@ public class PaymentService {
     }
 
     public void createPayment2(Payments payment){
-//        Optional<Merchant> receivingMerchant = merchantRepository.findByApiKey(apiKey);
-//        if (receivingMerchant.isEmpty()) {
-//            PaymentResponse response = new PaymentResponse();
-//            response.setResponse_code("3");
-//            response.setResponse_description("merchant not found");
-////            throw new IllegalArgumentException("merchant not found");
-//        }
-//
-//        payment.setMerchant(receivingMerchant.get());
-
-//        Integer merchantBalance = payment.getMerchant().getMerchantBalance();
-//
-//        payment.getMerchant().setMerchantBalance(merchantBalance + payment.getAmount());
-//        payment.setStatus(PaymentsStatus.PENDING);
+        payment.setStatus(PaymentsStatus.SUCCESS);
         paymentsRepository.save(payment);
 
     }

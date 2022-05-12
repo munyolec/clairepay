@@ -17,6 +17,7 @@ public class CardDetails {
             strategy = GenerationType.SEQUENCE,
             generator = "cardDetails_sequence"
     )
+    public String cvv;
     public String cardNumber;
     @NotNull
     public String expiryDate;
@@ -24,6 +25,12 @@ public class CardDetails {
 
     public CardDetails(){
 
+    }
+
+    public CardDetails(String cvv, String cardNumber, String expiryDate) {
+        this.cvv = cvv;
+        this.cardNumber = cardNumber;
+        this.expiryDate = expiryDate;
     }
 
     public CardDetails(String cardNumber, String expiryDate) {

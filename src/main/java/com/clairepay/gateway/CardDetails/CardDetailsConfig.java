@@ -14,11 +14,13 @@ public class CardDetailsConfig {
     ){
         return args -> {
             CardDetails one = new CardDetails(
+                    "222",
                     "12345678902423",
                     "05/22"
             );
 
             CardDetails two = new CardDetails(
+                    "454",
                     "12345364743223",
                     "06/22"
 
