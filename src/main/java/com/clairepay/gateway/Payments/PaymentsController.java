@@ -107,28 +107,19 @@ public class PaymentsController {
             newPaymentMethod.setMethodId(2L);
             payment.setPaymentMethod(newPaymentMethod);
         }
-
-
-
-        ///////
-
-        payment.setAmount(paymentRequest.getAmount());
-        service.createPayment2(payment, apiKey);
-
         PaymentResponse response = new PaymentResponse();
         response.setReferenceId(paymentRequest.getReferenceId());
 
+        payment.setTransactionId(response.getTransaction_id());
+
+        payment.setAmount(paymentRequest.getAmount());
+
+        //post payment to database
+        service.createPayment2(payment, apiKey);
+
+
+
         return response;
     }
-
-
-    @GetMapping(path="/paymentFor/{merchantId}")
-    public List<PaymentsDTO> getMerchantPayments(
-            @PathVariable Long merchantId,
-            @RequestHeader("apiKey") String apiKey){
-        return service.getMerchantPayments(apiKey);
-    }
-
-
 
 }

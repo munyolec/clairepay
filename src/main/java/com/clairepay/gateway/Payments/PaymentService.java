@@ -113,10 +113,4 @@ public class PaymentService {
 
     }
 
-    public List<PaymentsDTO> getMerchantPayments(String apiKey) {
-        return paymentsRepository.findByPayerApiKey(apiKey)
-                .stream()
-                .map(this::convertEntityToDTO)
-                .collect(Collectors.toList());
-    }
 }

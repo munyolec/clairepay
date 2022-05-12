@@ -30,15 +30,6 @@ public class MerchantController {
        return merchantService.getMerchant(merchantId);
     }
 
-    @GetMapping(path="/paymentFor/{merchantId}")
-    public Optional<Merchant> getMerchantPayments(
-            @PathVariable Long merchantId,
-            @RequestHeader("apiKey") String apiKey){
-        return merchantService.getMerchantPayments(apiKey);
-    }
-
-
-
 
 
 }

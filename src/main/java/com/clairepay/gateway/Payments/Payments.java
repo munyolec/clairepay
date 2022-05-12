@@ -39,6 +39,7 @@ public class Payments {
 
     private String currency = "KES";
     private Integer amount;
+    private String transactionId;
 
     @Enumerated(EnumType.STRING)
     private PaymentsStatus status;
