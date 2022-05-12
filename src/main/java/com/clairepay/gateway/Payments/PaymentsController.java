@@ -1,6 +1,7 @@
 package com.clairepay.gateway.Payments;
 
 
+import com.clairepay.gateway.CardDetails.CardDetails;
 import com.clairepay.gateway.Merchant.Merchant;
 import com.clairepay.gateway.Merchant.MerchantRepository;
 import com.clairepay.gateway.Payer.Payer;
@@ -42,39 +43,41 @@ public class PaymentsController {
         return service.getPayerPayment(payerId);
     }
 
-    @PutMapping(path = "/makePayment/payer/{payerId}/method/{paymentMethodId}/merchant/{merchantId}/{amount}")
-    @ResponseBody
-    public void makePayment(
-            @PathVariable("payerId") Long payer,
-            @PathVariable("paymentMethodId") Long paymentMethodId,
-            @PathVariable("merchantId") Long merchant,
-            @PathVariable("amount") Integer amount
-    ){
-        Payer newPayer = new Payer();
-        newPayer.setPayerId(payer);
-
-        PaymentMethod newPaymentMethod = new PaymentMethod();
-        newPaymentMethod.setMethodId(paymentMethodId);
-
-        Merchant newMerchant = new Merchant();
-        newMerchant.setMerchantId(merchant);
-
-        Payments payment = new Payments();
-        payment.setAmount(amount);
-
-        service.createPayment(newPayer,newMerchant,newPaymentMethod,amount);
-    }
+    /**
+     * create payment
+     */
+//    @PutMapping(path = "/makePayment/payer/{payerId}/method/{paymentMethodId}/merchant/{merchantId}/{amount}")
+//    @ResponseBody
+//    public void makePayment(
+//            @PathVariable("payerId") Long payer,
+//            @PathVariable("paymentMethodId") Long paymentMethodId,
+//            @PathVariable("merchantId") Long merchant,
+//            @PathVariable("amount") Integer amount
+//    ){
+//        Payer newPayer = new Payer();
+//        newPayer.setPayerId(payer);
+//
+//        PaymentMethod newPaymentMethod = new PaymentMethod();
+//        newPaymentMethod.setMethodId(paymentMethodId);
+//
+//        Merchant newMerchant = new Merchant();
+//        newMerchant.setMerchantId(merchant);
+//
+//        Payments payment = new Payments();
+//        payment.setAmount(amount);
+//
+//        service.createPayment(newPayer,newMerchant,newPaymentMethod,amount);
+//    }
 
     @PostMapping(value ="postPayment/{paymentMethod}")
     public PaymentResponse processPay(@Valid @RequestBody PaymentRequest paymentRequest,
-                                      @PathVariable("paymentMethod") String paymentMethod){
+                                      @PathVariable("paymentMethod") String paymentMethod,
+                                      @RequestHeader("apiKey") String apiKey){
         log.info("Received request::: " + paymentRequest);
         Payments payment = new Payments();
         PaymentMethod newPaymentMethod = new PaymentMethod();
 
-        //check if payer exists in database
-        //get email
-        //if new email value create a new payer
+        //check if payer exists in database,get email, if new email value create a new payer
         String payerEmail =paymentRequest.getPayer().getEmail();
 
         if(payerRepository.findByEmail(payerEmail).isPresent()){
@@ -86,22 +89,15 @@ public class PaymentsController {
 
         payment.setPayer(paymentRequest.getPayer());
 
-        //check if merchant exists in database
-        //get email
-        //if new email value create a new merchant
-
-        String merchantEmail = paymentRequest.getMerchant().getEmail();
-
-        if(merchantRepository.findByEmail(merchantEmail).isPresent()){
-            paymentRequest.setMerchant(merchantRepository.findByEmail(merchantEmail).get());
-        }
-        else{
-           throw new IllegalStateException("merchant not registered");
-        }
-        payment.setMerchant(paymentRequest.getMerchant());
-
         //TODO
-        //redo this logic
+        //check for card details if card was passed as payment method
+
+        paymentRequest.setPaymentMethod(paymentMethod);
+
+        if((paymentRequest.getPaymentMethod()).equalsIgnoreCase("Card")){
+            CardDetails card = new CardDetails("391310332842", "07/23");
+            paymentRequest.setCard(card);
+        }
 
         if(paymentMethod.equals("card")){
             newPaymentMethod.setMethodId(1L);
@@ -112,8 +108,12 @@ public class PaymentsController {
             payment.setPaymentMethod(newPaymentMethod);
         }
 
+
+
+        ///////
+
         payment.setAmount(paymentRequest.getAmount());
-        service.createPayment2(payment);
+        service.createPayment2(payment, apiKey);
 
         PaymentResponse response = new PaymentResponse();
         response.setReferenceId(paymentRequest.getReferenceId());

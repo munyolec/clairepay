@@ -100,7 +100,12 @@ public class PaymentService {
                 .collect(Collectors.toList());
     }
 
-    public void createPayment2(Payments payment){
+    public void createPayment2(Payments payment, String apiKey){
+        Optional<Merchant> receivingMerchant = merchantRepository.findByApiKey(apiKey);
+        if (receivingMerchant.isEmpty()) {
+            throw new IllegalArgumentException("merchant not found");
+        }
+        payment.setMerchant(receivingMerchant.get());
         Integer merchantBalance = payment.getMerchant().getMerchantBalance();
         payment.getMerchant().setMerchantBalance(merchantBalance + payment.getAmount());
         payment.setStatus(PaymentsStatus.PENDING);
