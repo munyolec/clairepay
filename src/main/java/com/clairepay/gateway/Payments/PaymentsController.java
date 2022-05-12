@@ -26,7 +26,9 @@ public class PaymentsController {
     private final MerchantRepository merchantRepository;
 
     @Autowired
-    public PaymentsController(PaymentService service, PayerRepository payerRepository, MerchantRepository merchantRepository) {
+    public PaymentsController(PaymentService service,
+                              PayerRepository payerRepository,
+                              MerchantRepository merchantRepository) {
         this.service = service;
         this.payerRepository = payerRepository;
         this.merchantRepository = merchantRepository;
@@ -45,12 +47,12 @@ public class PaymentsController {
     @PostMapping(value ="postPayment")
     public PaymentResponse processPay(@Valid @RequestBody PaymentRequest paymentRequest,
                                       @RequestHeader("apiKey") String apiKey){
-        log.info("Received request::: " + paymentRequest);
+
         Payments payment = new Payments();
         PaymentMethod newPaymentMethod = new PaymentMethod();
         PaymentResponse response = new PaymentResponse();
-
         response.setReferenceId(paymentRequest.getReferenceId());
+
 
         //check if merchant is registered
         if(merchantRepository.findByApiKey(apiKey).isPresent()){
@@ -63,8 +65,6 @@ public class PaymentsController {
             response.setResponse_description("wrong merchant apiKey");
             return(response);
         }
-
-
 
         //set payment method and validate
         if(paymentRequest.getPaymentMethod().equalsIgnoreCase("mpesa")){
@@ -79,7 +79,7 @@ public class PaymentsController {
                 String cardNumber = paymentRequest.getCard().getCardNumber();
                 String expiry = paymentRequest.getCard().getExpiryDate();
                 String cvv = paymentRequest.getCard().getCvv();
-                CardDetails card = new CardDetails(cardNumber, expiry, cvv);
+                CardDetails card = new CardDetails(cvv, cardNumber, expiry);
                 paymentRequest.setCard(card);
             }
             //check that card details have been provided
@@ -89,8 +89,6 @@ public class PaymentsController {
                return(response);
 
            }
-
-
         } else {
             response.setResponse_code("2");
             response.setResponse_description("invalid payment method");
@@ -118,12 +116,13 @@ public class PaymentsController {
 
         payment.setAmount(paymentRequest.getAmount());
 
-        if((response.getResponse_code() != "1") && (response.getResponse_code() != "2") && (response.getResponse_code() != "4")){
+        if((response.getResponse_code() != "1") && (response.getResponse_code() != "2")
+                && (response.getResponse_code() != "4")){
             response.setResponse_code("3");
             response.setResponse_description("payment successful");
             payment.setTransactionId(response.getTransaction_id());
         }
-
+        log.info("Received request::: " + paymentRequest);
         //post payment to database
         service.createPayment2(payment);
 
