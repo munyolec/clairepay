@@ -23,7 +23,6 @@ public class PaymentsController {
     private final PaymentService service;
     private final PayerRepository payerRepository;
     private final MerchantRepository merchantRepository;
-
     private final RabbitTemplate template;
     @Autowired
     public PaymentsController(PaymentService service,
@@ -79,7 +78,6 @@ public class PaymentsController {
                     paymentRequest.getPayer().getPhoneNumber(),
                     paymentRequest.getAmount()
             );
-//            template.convertAndSend(RabbitMQConfig.EXCHANGE,RabbitMQConfig.ROUTING_KEY,mpesaQueue);
             template.convertAndSend(RabbitMQConfig.EXCHANGE,RabbitMQConfig.ROUTING_KEY,mpesaQueue);
 
 
