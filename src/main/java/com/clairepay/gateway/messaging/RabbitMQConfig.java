@@ -1,4 +1,4 @@
-package com.clairepay.gateway.config;
+package com.clairepay.gateway.messaging;
 
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;

@@ -4,11 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Card {
+    @NotNull(message="cvv is required")
     private Integer cvv;
+
+    @NotEmpty(message="card number is required")
     private String cardNumber;
+
+    @Valid
     private Expiry expiry;
 }
