@@ -1,15 +1,14 @@
 package com.clairepay.gateway.Payments;
 
 
-import com.clairepay.gateway.CardDetails.CardDetails;
 import com.clairepay.gateway.Merchant.Merchant;
 import com.clairepay.gateway.Merchant.MerchantRepository;
-import com.clairepay.gateway.Payer.Payer;
 import com.clairepay.gateway.Payer.PayerRepository;
 import com.clairepay.gateway.PaymentMethod.PaymentMethod;
-import com.clairepay.gateway.dto.PaymentRequest;
-import com.clairepay.gateway.dto.PaymentResponse;
+import com.clairepay.gateway.config.RabbitMQConfig;
+import com.clairepay.gateway.dto.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,13 +24,15 @@ public class PaymentsController {
     private final PayerRepository payerRepository;
     private final MerchantRepository merchantRepository;
 
+    private final RabbitTemplate template;
     @Autowired
     public PaymentsController(PaymentService service,
                               PayerRepository payerRepository,
-                              MerchantRepository merchantRepository) {
+                              MerchantRepository merchantRepository, RabbitTemplate template) {
         this.service = service;
         this.payerRepository = payerRepository;
         this.merchantRepository = merchantRepository;
+        this.template = template;
     }
 
     @GetMapping("/")
@@ -70,6 +71,18 @@ public class PaymentsController {
         if(paymentRequest.getPaymentMethod().equalsIgnoreCase("mpesa")){
            newPaymentMethod.setMethodId(2L);
            payment.setPaymentMethod(newPaymentMethod);
+
+            //creating mpesa queue
+            MpesaQueue mpesaQueue = new MpesaQueue(
+                    paymentRequest.getPayer().getFirstName(),
+                    paymentRequest.getPayer().getLastName(),
+                    paymentRequest.getPayer().getPhoneNumber(),
+                    paymentRequest.getAmount()
+            );
+//            template.convertAndSend(RabbitMQConfig.EXCHANGE,RabbitMQConfig.ROUTING_KEY,mpesaQueue);
+            template.convertAndSend(RabbitMQConfig.EXCHANGE,RabbitMQConfig.ROUTING_KEY,mpesaQueue);
+
+
         }else if(paymentRequest.getPaymentMethod().equalsIgnoreCase("card")){
             newPaymentMethod.setMethodId(1L);
             payment.setPaymentMethod(newPaymentMethod);
@@ -77,12 +90,17 @@ public class PaymentsController {
             //setting card details
             if(paymentRequest.getCard() != null) {
                 String cardNumber = paymentRequest.getCard().getCardNumber();
-                String expiry = paymentRequest.getCard().getExpiryDate();
-                String cvv = paymentRequest.getCard().getCvv();
-                CardDetails card = new CardDetails(cvv, cardNumber, expiry);
+//                String expiry = paymentRequest.getCard().getExpiryDate();
+
+                Integer cvv = paymentRequest.getCard().getCvv();
+                Integer year = paymentRequest.getCard().getExpiry().getYear();
+                Integer month = paymentRequest.getCard().getExpiry().getMonth();
+
+                Expiry newExpiry = new Expiry(year, month);
+                Card card = new Card(cvv, cardNumber, newExpiry);
                 paymentRequest.setCard(card);
             }
-            //check that card details have been provided
+//            check that card details have been provided
            if(paymentRequest.getCard() == null){
                response.setResponse_code("4");
                response.setResponse_description("card details absent");
@@ -108,10 +126,6 @@ public class PaymentsController {
 
         //TODO
         //check for card details if card was passed as payment method
-
-
-
-
 
 
         payment.setAmount(paymentRequest.getAmount());

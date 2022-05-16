@@ -3,19 +3,18 @@ package com.clairepay.gateway.Payer;
 
 import com.clairepay.gateway.Payments.Payments;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-
+import javax.validation.constraints.*;
 import java.util.List;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @Table
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,property="payerId")
@@ -29,15 +28,15 @@ public class Payer {
             generator = "payer_sequence"
     )
     private Long payerId;
-    @NotNull(message="should not be null")
+    @NotEmpty(message="first name required")
     private String firstName;
-    @NotNull(message="should not be null")
+    @NotEmpty(message="last name required")
     private String lastName;
 
     @Email
     @UniqueEmail
     @Column(unique = true)
-    @NotNull
+    @NotEmpty(message="email required")
     private String email;
     @Size(min=10)
     @NotNull
@@ -45,6 +44,7 @@ public class Payer {
     private String phoneNumber;
 
     @OneToMany(mappedBy="payer",fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<Payments> payments;
 
     public Payer(){
@@ -66,5 +66,16 @@ public class Payer {
         return payerDTO;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Payer payer = (Payer) o;
+        return payerId != null && Objects.equals(payerId, payer.payerId);
+    }
 
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

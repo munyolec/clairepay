@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+
 
 @Data
 @Entity
@@ -46,7 +46,8 @@ public class Payments {
     public Payments() {
     }
 
-    public Payments(Long paymentId, Payer payer, Merchant merchant, PaymentMethod paymentMethod, String currency, Integer amount, PaymentsStatus status) {
+    public Payments(Long paymentId, Payer payer, Merchant merchant, PaymentMethod paymentMethod,
+                    String currency, Integer amount, PaymentsStatus status) {
         this.paymentId = paymentId;
         this.payer = payer;
         this.merchant = merchant;

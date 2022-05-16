@@ -1,10 +1,14 @@
 package com.clairepay.gateway.dto;
 
-import lombok.Data;
+import lombok.*;
 
 import java.util.UUID;
 
 @Data
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class PaymentResponse {
     private String requestId = UUID.randomUUID().toString();
     private String response_code;

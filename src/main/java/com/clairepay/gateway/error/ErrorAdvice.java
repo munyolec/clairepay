@@ -1,5 +1,7 @@
 package com.clairepay.gateway.error;
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -13,9 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class ErrorAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+
     public ApiError handleMethodArgNotValid(MethodArgumentNotValidException exception, HttpServletRequest request) {
         ApiError error = new ApiError(404, exception.getMessage(), request.getServletPath());
         BindingResult bindingResult = exception.getBindingResult();

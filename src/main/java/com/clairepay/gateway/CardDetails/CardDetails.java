@@ -17,23 +17,23 @@ public class CardDetails {
             strategy = GenerationType.SEQUENCE,
             generator = "cardDetails_sequence"
     )
-    public String cvv;
-    public String cardNumber;
+    private String cvv;
+    private String cardNumber;
     @NotNull
-    public String expiryDate;
+    private String expiryDate;
     @NotNull
 
     public CardDetails(){
 
     }
 
-    public CardDetails(String cvv, String cardNumber, String expiryDate) {
-        this.cvv = cvv;
+    public CardDetails(String cardNumber, String expiryDate) {
         this.cardNumber = cardNumber;
         this.expiryDate = expiryDate;
     }
 
-    public CardDetails(String cardNumber, String expiryDate) {
+    public CardDetails(String cvv, String cardNumber, String expiryDate) {
+        this.cvv = cvv;
         this.cardNumber = cardNumber;
         this.expiryDate = expiryDate;
     }
