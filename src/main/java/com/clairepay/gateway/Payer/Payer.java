@@ -2,6 +2,7 @@ package com.clairepay.gateway.Payer;
 
 
 import com.clairepay.gateway.Payments.Payments;
+import com.clairepay.gateway.dto.PayerDTO;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;

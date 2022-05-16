@@ -1,4 +1,4 @@
-package com.clairepay.gateway.PaymentMethod;
+package com.clairepay.gateway.dto;
 
 import lombok.Data;
 

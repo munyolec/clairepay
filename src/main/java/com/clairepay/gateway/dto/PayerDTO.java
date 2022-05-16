@@ -1,4 +1,4 @@
-package com.clairepay.gateway.Payer;
+package com.clairepay.gateway.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

@@ -2,16 +2,18 @@ package com.clairepay.gateway.Payments;
 
 import com.clairepay.gateway.Merchant.Merchant;
 import com.clairepay.gateway.Merchant.MerchantRepository;
+import com.clairepay.gateway.Payer.Payer;
+import com.clairepay.gateway.dto.PayerDTO;
 import com.clairepay.gateway.Payer.PayerRepository;
 import com.clairepay.gateway.PaymentMethod.PaymentMethod;
 import com.clairepay.gateway.dto.*;
-import com.clairepay.gateway.error.ApiErrorCode;
 import com.clairepay.gateway.messaging.RabbitMQConfig;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -134,13 +136,33 @@ public class PaymentService {
 //check if payer exists in database,get email, if new email value create a new payer
         String payerEmail =paymentRequest.getPayer().getEmail();
 
-        if(payerRepository.findByEmail(payerEmail).isPresent()){
-            paymentRequest.setPayer(payerRepository.findByEmail(payerEmail).get());
+        Optional<Payer> payerOptional = payerRepository.findByEmail(payerEmail);
+
+        if(payerOptional.isPresent()){
+
+            String firstName = payerOptional.get().getFirstName();
+            String lastName = payerOptional.get().getLastName();
+            String email = payerOptional.get().getEmail();
+            String phoneNumber = payerOptional.get().getPhoneNumber();
+            PayerDTO newPayer = new PayerDTO(firstName,lastName,email,phoneNumber);
+            paymentRequest.setPayer(newPayer);
+            payment.setPayer(payerOptional.get());
+
         }
         else{
+            String firstName = paymentRequest.getPayer().getFirstName();
+            String lastName = paymentRequest.getPayer().getLastName();
+            String email = paymentRequest.getPayer().getEmail();
+            String phoneNumber = paymentRequest.getPayer().getPhoneNumber();
+
+            Payer createNewPayer= new Payer(firstName,lastName,email,phoneNumber);
+            payerRepository.save(createNewPayer);
+
+            payment.setPayer(createNewPayer);
+
             paymentRequest.setPayer(paymentRequest.getPayer());
+
         }
-        payment.setPayer(paymentRequest.getPayer());
 
        //set amount
         payment.setAmount(paymentRequest.getAmount());

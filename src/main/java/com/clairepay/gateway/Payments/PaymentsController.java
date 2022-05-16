@@ -1,12 +1,8 @@
 package com.clairepay.gateway.Payments;
 
 
-import com.clairepay.gateway.Merchant.Merchant;
 import com.clairepay.gateway.Merchant.MerchantRepository;
 import com.clairepay.gateway.Payer.PayerRepository;
-import com.clairepay.gateway.PaymentMethod.PaymentMethod;
-import com.clairepay.gateway.error.InvalidParameterException;
-import com.clairepay.gateway.messaging.RabbitMQConfig;
 import com.clairepay.gateway.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
