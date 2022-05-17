@@ -119,7 +119,7 @@ public class PaymentService {
     }
 
 
-    public void validateCardNumber(int cardNumber){
+    public void validateCardNumber(long cardNumber){
         if (String.valueOf(cardNumber).length()  < 7 || String.valueOf(cardNumber).length()  > 12) {
             throw new InvalidParameterException("Invalid card number ");
         }
@@ -183,6 +183,8 @@ public class PaymentService {
             int month = paymentRequest.getCard().getExpiry().getMonth();
             int year = paymentRequest.getCard().getExpiry().getYear();
             validateCVV(paymentRequest.getCard().getCvv());
+            validateCardNumber(paymentRequest.getCard().getCardNumber());
+            validateExpiry(year,month);
             Expiry newExpiry = createExpiry(year, month);
             Card card = createCard(getCard.getCvv(), getCard.getCardNumber(), newExpiry);
             paymentRequest.setCard(card);
