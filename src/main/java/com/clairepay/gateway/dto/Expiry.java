@@ -14,10 +14,11 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Expiry {
+    @NotNull(message="year is required")
+    private Integer year;
+
     @NotNull(message="month is required")
     @Range(min= 1, max= 12, message="month invalid")
-    private int month;
+    private Integer month;
 
-    @NotNull(message="year is required")
-    private int year;
 }

@@ -31,18 +31,20 @@ public class PaymentService {
     private final PaymentsRepository paymentsRepository;
     private final PaymentMethodRepository paymentMethodRepository;
     private final RabbitTemplate template;
+    private final ConsumeChargeCardService consumeChargeCardService;
 
     @Autowired
     public PaymentService(PayerRepository payerRepository,
                           MerchantRepository merchantRepository,
                           PaymentsRepository paymentsRepository,
                           PaymentMethodRepository paymentMethodRepository,
-                          RabbitTemplate template) {
+                          RabbitTemplate template, ConsumeChargeCardService consumeChargeCardService) {
         this.payerRepository = payerRepository;
         this.merchantRepository = merchantRepository;
         this.paymentsRepository = paymentsRepository;
         this.paymentMethodRepository = paymentMethodRepository;
         this.template = template;
+        this.consumeChargeCardService = consumeChargeCardService;
     }
 
     /**
@@ -187,6 +189,15 @@ public class PaymentService {
             Expiry newExpiry = createExpiry(year, month);
             Card card = createCard(getCard.getCvv(), getCard.getCardNumber(), newExpiry);
             paymentRequest.setCard(card);
+
+            ChargeCard chargeCard = new ChargeCard(
+                    getPayer.getFirstName(), paymentRequest.getCurrency(), paymentRequest.getCountry(),
+                    getPayer.getEmail(), getCard.getCardNumber(),getCard.getCvv(), newExpiry, paymentRequest.getAmount()
+                    );
+
+            consumeChargeCardService.callChargeCardAPI(chargeCard);
+
+
         }
     }
 
