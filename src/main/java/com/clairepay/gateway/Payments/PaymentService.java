@@ -9,7 +9,7 @@ import com.clairepay.gateway.Payer.PayerRepository;
 import com.clairepay.gateway.PaymentMethod.PaymentMethod;
 import com.clairepay.gateway.dto.*;
 import com.clairepay.gateway.error.InvalidParameterException;
-import com.clairepay.gateway.filter.ThreadLocalRequest;
+
 import com.clairepay.gateway.messaging.RabbitMQConfig;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.clairepay.gateway.error.ApiErrorCode.PAYMENT_SUCCESSFUL;
 
 @Service
 public class PaymentService {
@@ -76,95 +78,90 @@ public class PaymentService {
                 .map(this::convertEntityToDTO)
                 .collect(Collectors.toList());
     }
-
-   public void createMpesaQueue(String firstName, String lastName, String email, String phoneNumber,
-                                      Integer amount){
+    public void createMpesaQueue(String firstName, String lastName, String email, String phoneNumber, Integer amount){
        MpesaQueue mpesaQueue = new MpesaQueue(
                firstName, lastName, email, phoneNumber, amount
        );
        template.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY, mpesaQueue);
-   }
-
+    }
     public void createNewPayer(String firstName, String lastName, String email, String phoneNumber) {
         Payer newPayer= new Payer(firstName,lastName,email,phoneNumber);
         payerRepository.save(newPayer);
     }
-
     public Expiry createExpiry(int month,int year){
-        Expiry expiry = new Expiry(month,year);
-        return expiry;
+        return new Expiry(month,year);
     }
-
     public Card createCard(int cvv, long cardNumber, Expiry expiry){
-        Card card = new Card(cvv, cardNumber, expiry);
-        return card;
+        return new Card(cvv, cardNumber, expiry);
     }
-
     public void validateExpiry(int year, int month){
         LocalDate now = LocalDate.now();
-
         if (year < now.getYear()) {
             throw new InvalidParameterException("card has expired");
         }
-
         if (year == now.getYear() && month < now.getMonth().getValue()) {
             throw new InvalidParameterException("card has expired");
         }
     }
-
     public void validateCVV(int cvv){
         if (String.valueOf(cvv).length() != 3) {
             throw new InvalidParameterException("Invalid cvv ");
         }
     }
-
-
     public void validateCardNumber(long cardNumber){
         if (String.valueOf(cardNumber).length()  < 7 || String.valueOf(cardNumber).length()  > 12) {
             throw new InvalidParameterException("Invalid card number ");
         }
     }
+    public void validateAmount(int amount){
+        if (amount < 1) {
+            throw new InvalidParameterException("Amount cannot be less than 1");
+        }
+        if (amount > 1_000_000) {
+            throw new InvalidParameterException("Amount cannot be greater than 1 000 000");
+        }
+    }
+    public void validateCurrency(String currency){
+        if (!ALLOWED_CURRENCIES.contains(currency.toUpperCase())) {
+            throw new InvalidParameterException("Currency not supported");
+        }
+    }
+    public void validateCountries(String country){
+        if (!ALLOWED_COUNTRIES.contains(country.toUpperCase())) {
+            throw new InvalidParameterException("Country not supported");
+        }
+    }
 
+
+    //*********================  PAYMENT PROCESSOR ========================************
     public PaymentResponse paymentProcessor(PaymentRequest paymentRequest, String apiKey){
-    // generate a request_id
-
-    Payments payment = new Payments();
-    PaymentResponse response = new PaymentResponse();
+        //TODO: attempt to do db retry
+    Payments payment = new Payments(); PaymentResponse response = new PaymentResponse();
+    PayerDTO getPayer = paymentRequest.getPayer(); Card getCard = paymentRequest.getCard();
     response.setReferenceId(paymentRequest.getReferenceId());
-    PayerDTO getPayer = paymentRequest.getPayer();
-    Card getCard = paymentRequest.getCard();
 
     //check that merchant exists
     Optional<Merchant> MerchantOptional = merchantRepository.findByApiKey(apiKey);
-
     if(MerchantOptional.isPresent()){
         Merchant merchantFound = MerchantOptional.get();
         payment.setMerchant(merchantFound);
-        //TODO: read on how to better store this data in db
+        //TODO : research on how to better update this data
         merchantFound.setMerchantBalance((merchantFound.getMerchantBalance() + paymentRequest.getAmount()));
-    }
-    else{
+    } else {
         throw new InvalidParameterException("merchant not found");
     }
 
-    // supported currencies, countries,
-    if (!ALLOWED_CURRENCIES.contains(paymentRequest.getCurrency().toUpperCase())) {
-        throw new InvalidParameterException("Currency not supported");
-    }
-    if (!ALLOWED_COUNTRIES.contains(paymentRequest.getCountry().toUpperCase())) {
-        throw new InvalidParameterException("Country not supported for the moment");
-        }
+   //validate currency & countries
+    validateCurrency(paymentRequest.getCurrency());
+    validateCountries(paymentRequest.getCountry());
 
     //TODO: SOLID - open closed principle
-
-    //check if payment method exists and payment method
+    //check if payment method exists
     String passedMethod = paymentRequest.getPaymentMethod().getMethodName();
-
     Optional<PaymentMethod> paymentMethodOptional = paymentMethodRepository.findByMethodNameIgnoreCase(passedMethod);
     if(paymentMethodOptional.isPresent()) {
         payment.setPaymentMethod(paymentMethodOptional.get());
-    }
-    else{
+    } else {
         throw new InvalidParameterException("payment method not available");
     }
 
@@ -182,60 +179,41 @@ public class PaymentService {
         if (paymentRequest.getCard() != null) {
             int month = paymentRequest.getCard().getExpiry().getMonth();
             int year = paymentRequest.getCard().getExpiry().getYear();
+            //validate card
             validateCVV(paymentRequest.getCard().getCvv());
             validateCardNumber(paymentRequest.getCard().getCardNumber());
             validateExpiry(year,month);
+
             Expiry newExpiry = createExpiry(year, month);
             Card card = createCard(getCard.getCvv(), getCard.getCardNumber(), newExpiry);
             paymentRequest.setCard(card);
         }
-
     }
 
 //check if payer exists in database,get email, if new email value create a new payer
-    String payerEmail =paymentRequest.getPayer().getEmail();
-    Optional<Payer> payerOptional = payerRepository.findByEmail(payerEmail);
-
+    Optional<Payer> payerOptional = payerRepository.findByEmail(paymentRequest.getPayer().getEmail());
     if(payerOptional.isPresent()){
         PayerDTO newPayer = new PayerDTO(payerOptional.get().getFirstName(),payerOptional.get().getLastName(),
                 payerOptional.get().getEmail(),payerOptional.get().getPhoneNumber());
         paymentRequest.setPayer(newPayer);
         payment.setPayer(payerOptional.get());
-    }
-    else{
-        //create new payer
+    } else{
         createNewPayer(getPayer.getFirstName(),getPayer.getLastName(),getPayer.getEmail(),getPayer.getPhoneNumber());
         paymentRequest.setPayer(paymentRequest.getPayer());
-
     }
-
-   //set amount
-    // valid amount
-    if (paymentRequest.getAmount() < 1) {
-        throw new InvalidParameterException("Amount cannot be less than 1");
-    }
-
-    if (paymentRequest.getAmount() > 1_000_000) {
-        throw new InvalidParameterException("Amount cannot be greater than 1 000 000");
-    }
+   //validate amount and set
+    validateAmount(paymentRequest.getAmount());
     payment.setAmount(paymentRequest.getAmount());
 
-    //TODO
-    // successful payment response code
-    if((response.getResponseCode() != "1") && (response.getResponseCode() != "2")
-            && (response.getResponseCode() != "4")){
-        response.setResponseCode("3");
-        response.setResponseDescription("payment successful");
-        payment.setTransactionId(response.getTransactionId());
-    }
-    payment.setTransactionId(response.getTransactionId());
+    //TODO : successful payment response code
+     int code = PAYMENT_SUCCESSFUL.getCode();
+     response.setResponseCode(String.valueOf(code));
+     response.setResponseDescription("payment successful");
 
-    response.setReferenceId(paymentRequest.getReferenceId());
+    payment.setTransactionId(response.getTransactionId());
     payment.setStatus(PaymentsStatus.SUCCESS);
 
-//save payment to DB
     paymentsRepository.save(payment);
-
    return response;
 }
 

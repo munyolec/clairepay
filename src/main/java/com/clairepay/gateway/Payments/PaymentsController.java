@@ -17,28 +17,20 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "api/v1/clairepay/payments")
 public class PaymentsController {
-    private final PaymentService service;
-    private final PayerRepository payerRepository;
-    private final MerchantRepository merchantRepository;
-    private final RabbitTemplate template;
+    private final PaymentService paymentService;
     @Autowired
-    public PaymentsController(PaymentService service,
-                              PayerRepository payerRepository,
-                              MerchantRepository merchantRepository, RabbitTemplate template) {
-        this.service = service;
-        this.payerRepository = payerRepository;
-        this.merchantRepository = merchantRepository;
-        this.template = template;
+    public PaymentsController(PaymentService service) {
+        this.paymentService = service;
     }
 
     @GetMapping("/")
     public List<PaymentsDTO> getAllPayments() {
-        return service.getAllPayments();
+        return paymentService.getAllPayments();
     }
 
     @GetMapping(path = "/{payerId}/payments")
     public List<PaymentsDTO> getPayments(@PathVariable("payerId") Long payerId) {
-        return service.getPayerPayment(payerId);
+        return paymentService.getPayerPayment(payerId);
     }
 
 
@@ -47,7 +39,7 @@ public class PaymentsController {
                                       @RequestHeader("apiKey") String apiKey){
 
         log.info("Request received -->" + paymentRequest);
-        PaymentResponse response = service.paymentProcessor(paymentRequest, apiKey);
+        PaymentResponse response = paymentService.paymentProcessor(paymentRequest, apiKey);
         log.info("API Response  -->" + response);
         return response;
     }
