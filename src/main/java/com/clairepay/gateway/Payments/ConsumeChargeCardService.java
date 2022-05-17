@@ -24,14 +24,13 @@ public class ConsumeChargeCardService {
     RestTemplate restTemplate;
 
     @RequestMapping(value = "/chargeCard/", method = RequestMethod.POST)
-    public String callChargeCardAPI(@RequestBody ChargeCard card) {
+    public void callChargeCardAPI(@RequestBody ChargeCard card) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         HttpEntity<ChargeCard> entity = new HttpEntity<ChargeCard>(card,headers);
-        log.info(restTemplate.exchange(
+        log.info("Charge Card Response -> " + restTemplate.exchange(
                 "http://localhost:8081/api/v1/card/charge", HttpMethod.POST, entity, String.class).getBody());
-        return restTemplate.exchange(
-                "http://localhost:8081/api/v1/card/charge", HttpMethod.POST, entity, String.class).getBody();
+
     }
 
 }
