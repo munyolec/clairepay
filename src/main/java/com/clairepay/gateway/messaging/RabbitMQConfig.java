@@ -20,7 +20,7 @@ public class RabbitMQConfig {
     }
     @Bean
     public TopicExchange exchange(){
-        return  new TopicExchange(EXCHANGE);
+        return new TopicExchange(EXCHANGE);
     }
     @Bean
     public Binding binding(Queue queue, TopicExchange exchange){

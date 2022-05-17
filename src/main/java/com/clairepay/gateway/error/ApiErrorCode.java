@@ -3,10 +3,8 @@ package com.clairepay.gateway.error;
 public enum ApiErrorCode {
     MISSING_PARAMETER(203),
     UNREADABLE_MESSAGE(204),
-    INVALID_PARAMETER(205);
-
-
-
+    INVALID_PARAMETER(205),
+    PAYMENT_SUCCESSFUL(206);
     int code;
     ApiErrorCode(int code) {
         this.code = code;

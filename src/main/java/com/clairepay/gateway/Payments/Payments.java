@@ -29,7 +29,7 @@ public class Payments {
     @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name = "payer_Id", nullable = false)
     private Payer payer;
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "merchant_Id", nullable = false)
     private Merchant merchant;
 

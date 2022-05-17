@@ -1,5 +1,6 @@
 package com.clairepay.gateway.dto;
 
+import com.clairepay.gateway.PaymentMethod.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -16,6 +17,7 @@ import javax.validation.constraints.Size;
 public class PaymentRequest  {
     @JsonProperty("reference_id")
     @NotEmpty(message="reference id is required")
+
     private String referenceId;
 
     @NotEmpty(message="country is required")
@@ -29,8 +31,8 @@ public class PaymentRequest  {
     @NotNull(message="amount is required")
     private Integer amount;
 
-    @NotEmpty(message="payment method is required")
-    private String paymentMethod;
+    @Valid
+    private PaymentMethodDTO paymentMethod;
 
     @Valid
     private PayerDTO payer;

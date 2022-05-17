@@ -1,5 +1,7 @@
 package com.clairepay.gateway.dto;
 
+import com.clairepay.gateway.filter.ThreadLocalRequest;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.UUID;
@@ -10,9 +12,14 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class PaymentResponse {
-    private String requestId = UUID.randomUUID().toString();
-    private String response_code;
-    private String response_description;
-    private String referenceId;
-    private String transaction_id = UUID.randomUUID().toString();
+    @JsonProperty("request_id")
+    private String requestId = ThreadLocalRequest.getRequestId();
+    @JsonProperty("response_code")
+    private String responseCode;
+    @JsonProperty("response_description")
+    private String responseDescription;
+    @JsonProperty("reference_id")
+    private String referenceId ;
+    @JsonProperty("transaction_id")
+    private String transactionId = UUID.randomUUID().toString();
 }

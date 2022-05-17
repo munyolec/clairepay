@@ -45,8 +45,8 @@ public class Merchant {
     public Merchant() {
     }
 
-    public Merchant(String firstName, String lastName, String email, String phoneNumber) {
-
+    public Merchant(String apiKey,String firstName, String lastName, String email, String phoneNumber) {
+        this.apiKey = apiKey;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

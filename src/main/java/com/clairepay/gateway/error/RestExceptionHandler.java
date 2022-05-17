@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -28,8 +29,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                                                           WebRequest request) {
         String message = ex.getParameterName() + "is required";
         PaymentResponse paymentResponse = PaymentResponse.builder()
-                .response_code(String.valueOf(ApiErrorCode.MISSING_PARAMETER.getCode()))
-                .response_description(message)
+                .responseCode(String.valueOf(ApiErrorCode.MISSING_PARAMETER.getCode()))
+                .responseDescription(message)
                 .build();
         return new ResponseEntity<>(paymentResponse, HttpStatus.BAD_REQUEST);
     }
@@ -40,8 +41,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   WebRequest request) {
         String message = ex.getLocalizedMessage();
         PaymentResponse paymentResponse = PaymentResponse.builder()
-                .response_code(String.valueOf(ApiErrorCode.UNREADABLE_MESSAGE.getCode()))
-                .response_description(message)
+                .responseCode(String.valueOf(ApiErrorCode.UNREADABLE_MESSAGE.getCode()))
+                .responseDescription(message)
                 .build();
         return new ResponseEntity<>(paymentResponse, HttpStatus.BAD_REQUEST);
     }
@@ -61,9 +62,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             errorCode = ApiErrorCode.INVALID_PARAMETER.getCode();
         }
         PaymentResponse paymentResponse = PaymentResponse.builder()
-                .response_code(String.valueOf(errorCode))
-                .response_description(message)
+                .responseCode(String.valueOf(errorCode))
+                .responseDescription(message)
                 .build();
+        return new ResponseEntity<>(paymentResponse, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(InvalidParameterException.class)
+    public ResponseEntity<PaymentResponse> handleInvalidParameter(InvalidParameterException e) {
+
+        PaymentResponse paymentResponse = PaymentResponse.builder()
+                .responseCode(String.valueOf(ApiErrorCode.INVALID_PARAMETER.getCode()))
+                .responseDescription(e.getMessage())
+//                .requestId(ThreadLocalRequest.getRequestId())
+                .build();
+
         return new ResponseEntity<>(paymentResponse, HttpStatus.BAD_REQUEST);
     }
 

@@ -16,12 +16,14 @@ public class MerchantConfig {
     ){
         return args -> {
             Merchant one = new Merchant(
+                    "ef99a898-a515-414d-9655-5bf1a0fede0d",
                    "Malek",
                     "Waters",
                     "malek@gmail.com",
                     "0700256345"
             );
             Merchant two = new Merchant(
+                    "bd68fc83-6b07-4c87-9142-e49081358ffa",
                     "Walter",
                     "Richards",
                     "richwalt@gmail.com",

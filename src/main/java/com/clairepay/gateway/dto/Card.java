@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -13,10 +12,10 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class Card {
     @NotNull(message="cvv is required")
-    private Integer cvv;
+    private int cvv;
 
-    @NotEmpty(message="card number is required")
-    private String cardNumber;
+    @NotNull(message="card number is required")
+    private long cardNumber;
 
     @Valid
     private Expiry expiry;
