@@ -88,9 +88,10 @@ public class PaymentService {
        );
        template.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY, mpesaQueue);
     }
-    public void createNewPayer(String firstName, String lastName, String email, String phoneNumber) {
+    public Payer createNewPayer(String firstName, String lastName, String email, String phoneNumber) {
         Payer newPayer= new Payer(firstName,lastName,email,phoneNumber);
         payerRepository.save(newPayer);
+        return newPayer;
     }
     public Expiry createExpiry(int month,int year){
         return new Expiry(month,year);
@@ -210,9 +211,11 @@ public class PaymentService {
                 payerOptional.get().getEmail(),payerOptional.get().getPhoneNumber());
         paymentRequest.setPayer(newPayer);
         payment.setPayer(payerOptional.get());
-    } else{
-        createNewPayer(getPayer.getFirstName(),getPayer.getLastName(),getPayer.getEmail(),getPayer.getPhoneNumber());
+    } else {
+        Payer payerNew = createNewPayer(getPayer.getFirstName(),getPayer.getLastName(),getPayer.getEmail(),
+                getPayer.getPhoneNumber());
         paymentRequest.setPayer(paymentRequest.getPayer());
+        payment.setPayer(payerNew);
     }
    //validate amount and set
     validateAmount(paymentRequest.getAmount());
