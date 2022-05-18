@@ -22,4 +22,5 @@ public class PaymentResponse {
     private String referenceId ;
     @JsonProperty("transaction_id")
     private String transactionId = UUID.randomUUID().toString();
+
 }

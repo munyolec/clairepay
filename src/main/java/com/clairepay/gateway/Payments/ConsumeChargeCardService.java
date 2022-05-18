@@ -16,7 +16,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 
-
 @RestController
 @Slf4j
 public class ConsumeChargeCardService {

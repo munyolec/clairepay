@@ -9,6 +9,7 @@ import javax.validation.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -17,8 +18,7 @@ import javax.validation.constraints.Size;
 public class PaymentRequest  {
     @JsonProperty("reference_id")
     @NotEmpty(message="reference id is required")
-
-    private String referenceId;
+    private String referenceId ;
 
     @NotEmpty(message="country is required")
     @Size(min=3, max=4)
@@ -41,3 +41,4 @@ public class PaymentRequest  {
     private Card card;
 
     }
+

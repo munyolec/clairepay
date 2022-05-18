@@ -8,8 +8,10 @@ import com.clairepay.gateway.dto.PayerDTO;
 import com.clairepay.gateway.Payer.PayerRepository;
 import com.clairepay.gateway.PaymentMethod.PaymentMethod;
 import com.clairepay.gateway.dto.*;
+import com.clairepay.gateway.error.ApiErrorCode;
 import com.clairepay.gateway.error.InvalidParameterException;
 
+import com.clairepay.gateway.filter.ThreadLocalRequest;
 import com.clairepay.gateway.messaging.RabbitMQConfig;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,7 +139,7 @@ public class PaymentService {
 
     //*********================  PAYMENT PROCESSOR ========================************
     public PaymentResponse paymentProcessor(PaymentRequest paymentRequest, String apiKey){
-        //TODO: attempt to do db retry
+        //TODO: attempt to do db retryString requestId = ThreadLocalRequest.getRequestId();
     Payments payment = new Payments(); PaymentResponse response = new PaymentResponse();
     PayerDTO getPayer = paymentRequest.getPayer(); Card getCard = paymentRequest.getCard();
     response.setReferenceId(paymentRequest.getReferenceId());
@@ -147,6 +149,7 @@ public class PaymentService {
     if(MerchantOptional.isPresent()){
         Merchant merchantFound = MerchantOptional.get();
         payment.setMerchant(merchantFound);
+
         //TODO : research on how to better update this data
         merchantFound.setMerchantBalance((merchantFound.getMerchantBalance() + paymentRequest.getAmount()));
     } else {
@@ -173,7 +176,7 @@ public class PaymentService {
                 getPayer.getPhoneNumber(),paymentRequest.getAmount());
     }
 
-    //Require card information for Card Details
+    //Require card information for Card Details and call charge card API
     if((paymentRequest.getPaymentMethod().getMethodName().equalsIgnoreCase("card"))) {
         if(paymentRequest.getCard() == null){
             throw new InvalidParameterException("card details required");
@@ -190,13 +193,12 @@ public class PaymentService {
             Card card = createCard(getCard.getCvv(), getCard.getCardNumber(), newExpiry);
             paymentRequest.setCard(card);
 
+            //call card API
             ChargeCard chargeCard = new ChargeCard(
                     getPayer.getFirstName(), paymentRequest.getCurrency(), paymentRequest.getCountry(),
-                    getPayer.getEmail(), getCard.getCardNumber(),getCard.getCvv(), newExpiry, paymentRequest.getAmount()
+                    getPayer.getEmail(), getCard.getCardNumber(),getCard.getCvv(),newExpiry, paymentRequest.getAmount()
                     );
-
             consumeChargeCardService.callChargeCardAPI(chargeCard);
-
 
         }
     }
@@ -216,15 +218,18 @@ public class PaymentService {
     validateAmount(paymentRequest.getAmount());
     payment.setAmount(paymentRequest.getAmount());
 
+
     //TODO : successful payment response code
+
      int code = PAYMENT_SUCCESSFUL.getCode();
      response.setResponseCode(String.valueOf(code));
-     response.setResponseDescription("payment successful");
+     response.setResponseDescription(ApiErrorCode.getDescription(code));
 
     payment.setTransactionId(response.getTransactionId());
     payment.setStatus(PaymentsStatus.SUCCESS);
 
     paymentsRepository.save(payment);
+
    return response;
 }
 
