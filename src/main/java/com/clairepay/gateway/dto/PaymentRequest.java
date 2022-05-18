@@ -32,6 +32,7 @@ public class PaymentRequest  {
     private Integer amount;
 
     @Valid
+//    @NotEmpty(message="payment is required")
     private PaymentMethodDTO paymentMethod;
 
     @Valid

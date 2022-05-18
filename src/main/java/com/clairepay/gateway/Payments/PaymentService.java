@@ -108,6 +108,11 @@ public class PaymentService {
             throw new InvalidParameterException("card has expired");
         }
     }
+    public void validateYear(int year) {
+        if(String.valueOf(year).length() !=4){
+            throw new InvalidParameterException("invalid year");
+        }
+    }
     public void validateCVV(int cvv){
         if (String.valueOf(cvv).length() != 3) {
             throw new InvalidParameterException("Invalid cvv ");
@@ -163,6 +168,9 @@ public class PaymentService {
 
     //TODO: SOLID - open closed principle
     //check if payment method exists
+    if(paymentRequest.getPaymentMethod() == null){
+        throw new InvalidParameterException("payment method is required");
+    }
     String passedMethod = paymentRequest.getPaymentMethod().getMethodName();
     Optional<PaymentMethod> paymentMethodOptional = paymentMethodRepository.findByMethodNameIgnoreCase(passedMethod);
     if(paymentMethodOptional.isPresent()) {
@@ -188,6 +196,7 @@ public class PaymentService {
             //validate card
             validateCVV(paymentRequest.getCard().getCvv());
             validateCardNumber(paymentRequest.getCard().getCardNumber());
+            validateYear(year);
             validateExpiry(year,month);
 
             Expiry newExpiry = createExpiry(year, month);
