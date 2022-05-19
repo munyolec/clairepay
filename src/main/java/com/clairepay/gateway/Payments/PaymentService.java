@@ -15,6 +15,7 @@ import com.clairepay.gateway.messaging.RabbitMQConfig;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -152,8 +153,16 @@ public class PaymentService {
         }
     }
 
+    public void validateReferenceId(String referenceId){
+        Optional<Payments> paymentOptional = paymentsRepository.findByReferenceId(referenceId);
+        if(paymentOptional.isPresent()){
+            throw new InvalidParameterException("duplicate reference id");
+        }
+    }
+
 
     //*********================  PAYMENT PROCESSOR ========================************
+    @Transactional
     public PaymentResponse paymentProcessor(PaymentRequest paymentRequest, String apiKey) {
         //TODO: attempt to do db retryString requestId = ThreadLocalRequest.getRequestId();
         Payments payment = new Payments();
@@ -248,7 +257,9 @@ public class PaymentService {
         response.setResponseCode(String.valueOf(code));
         response.setResponseDescription(ApiErrorCode.getDescription(code));
 
+        validateReferenceId(response.getReferenceId());
         payment.setReferenceId(response.getReferenceId());
+
         payment.setTransactionId(response.getTransactionId());
         payment.setStatus(PaymentsStatus.SUCCESS);
 
