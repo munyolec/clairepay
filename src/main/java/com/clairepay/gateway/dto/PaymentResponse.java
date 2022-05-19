@@ -9,18 +9,25 @@ import java.util.UUID;
 @Data
 @ToString
 @AllArgsConstructor
-@NoArgsConstructor
+
 @Builder
 public class PaymentResponse {
     @JsonProperty("request_id")
-    private String requestId = ThreadLocalRequest.getRequestId();
+    private String requestId ;
+
     @JsonProperty("response_code")
     private String responseCode;
+
     @JsonProperty("response_description")
     private String responseDescription;
+
     @JsonProperty("reference_id")
-    private String referenceId ;
+    private String referenceId;
+
     @JsonProperty("transaction_id")
     private String transactionId = UUID.randomUUID().toString();
 
+    public PaymentResponse() {
+        this.requestId = ThreadLocalRequest.getRequestId();
+    }
 }

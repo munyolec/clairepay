@@ -13,7 +13,7 @@ public class PaymentMethodsConfig {
     @Bean
     CommandLineRunner commandLineRunnerPM(
             PaymentMethodRepository repository
-    ){
+    ) {
         return args -> {
             PaymentMethod card = new PaymentMethod(
                     "Card"

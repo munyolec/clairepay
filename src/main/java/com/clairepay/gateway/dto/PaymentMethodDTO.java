@@ -12,7 +12,7 @@ import javax.validation.constraints.NotEmpty;
 @AllArgsConstructor
 @ToString
 public class PaymentMethodDTO {
-//    private Long methodId;
+    //    private Long methodId;
     @NotEmpty(message = "payment method is required")
     private String methodName;
 }

@@ -26,7 +26,7 @@ public class ConsumeChargeCardService {
     public void callChargeCardAPI(@RequestBody ChargeCard card) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        HttpEntity<ChargeCard> entity = new HttpEntity<ChargeCard>(card,headers);
+        HttpEntity<ChargeCard> entity = new HttpEntity<ChargeCard>(card, headers);
         log.info("Charge Card Response -> " + restTemplate.exchange(
                 "http://localhost:8081/api/v1/card/charge", HttpMethod.POST, entity, String.class).getBody());
 

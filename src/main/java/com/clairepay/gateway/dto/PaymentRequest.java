@@ -15,20 +15,20 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class PaymentRequest  {
+public class PaymentRequest {
     @JsonProperty("reference_id")
-    @NotEmpty(message="reference id is required")
-    private String referenceId ;
+    @NotEmpty(message = "reference id is required")
+    private String referenceId;
 
-    @NotEmpty(message="country is required")
-    @Size(min=3, max=4)
+    @NotEmpty(message = "country is required")
+    @Size(min = 3, max = 4)
     private String country;
 
-    @NotEmpty(message="currency is required")
-    @Size(min=3, max=4)
+    @NotEmpty(message = "currency is required")
+    @Size(min = 3, max = 4)
     private String currency;
 
-    @NotNull(message="amount is required")
+    @NotNull(message = "amount is required")
     private Integer amount;
 
     @Valid
@@ -41,5 +41,5 @@ public class PaymentRequest  {
     @Valid
     private Card card;
 
-    }
+}
 

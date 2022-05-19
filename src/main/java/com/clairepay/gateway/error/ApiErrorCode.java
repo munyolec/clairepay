@@ -6,6 +6,7 @@ public enum ApiErrorCode {
     INVALID_PARAMETER(205),
     PAYMENT_SUCCESSFUL(206);
     int code;
+
     ApiErrorCode(int code) {
         this.code = code;
     }
@@ -13,13 +14,14 @@ public enum ApiErrorCode {
     public int getCode() {
         return code;
     }
+
     public static String getDescription(int code) {
         for (ApiErrorCode errorCode : ApiErrorCode.values()) {
             if (code == errorCode.getCode()) {
                 return errorCode.toString();
             }
         }
-        return  null;
+        return null;
     }
 }
 

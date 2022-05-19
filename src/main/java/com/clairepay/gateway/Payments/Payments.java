@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,property="paymentId")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "paymentId")
 
 public class Payments {
     @Id
@@ -26,7 +26,7 @@ public class Payments {
     )
     private Long paymentId;
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "payer_Id", nullable = false)
     private Payer payer;
     @ManyToOne()
@@ -41,8 +41,12 @@ public class Payments {
     private Integer amount;
     private String transactionId;
 
+    private String referenceId;
+
+
     @Enumerated(EnumType.STRING)
     private PaymentsStatus status;
+
     public Payments() {
     }
 

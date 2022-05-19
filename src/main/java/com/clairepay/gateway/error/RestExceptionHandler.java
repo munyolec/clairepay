@@ -2,6 +2,7 @@
 package com.clairepay.gateway.error;
 
 import com.clairepay.gateway.dto.PaymentResponse;
+import com.clairepay.gateway.filter.ThreadLocalRequest;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -73,7 +74,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         PaymentResponse paymentResponse = PaymentResponse.builder()
                 .responseCode(String.valueOf(ApiErrorCode.INVALID_PARAMETER.getCode()))
                 .responseDescription(e.getMessage())
-//                .requestId(ThreadLocalRequest.getRequestId())
+                .requestId(ThreadLocalRequest.getRequestId())
                 .build();
 
         return new ResponseEntity<>(paymentResponse, HttpStatus.BAD_REQUEST);

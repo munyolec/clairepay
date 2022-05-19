@@ -11,7 +11,8 @@ import java.util.stream.Collectors;
 public class PayerService {
 
     private final PayerRepository payerRepository;
-     @Autowired
+
+    @Autowired
     public PayerService(PayerRepository payerRepository) {
         this.payerRepository = payerRepository;
     }
@@ -34,11 +35,11 @@ public class PayerService {
     }
 
 
-    public Boolean getPayerByEmail(String email){
+    public Boolean getPayerByEmail(String email) {
         return payerRepository.selectExistsByEmail(email);
     }
 
     public Payer addNewPayer(Payer payer) {
-         return this.payerRepository.save(payer);
+        return this.payerRepository.save(payer);
     }
 }

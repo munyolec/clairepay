@@ -18,6 +18,7 @@ import java.util.List;
 @RequestMapping(path = "api/v1/clairepay/payments")
 public class PaymentsController {
     private final PaymentService paymentService;
+
     @Autowired
     public PaymentsController(PaymentService service) {
         this.paymentService = service;
@@ -34,9 +35,9 @@ public class PaymentsController {
     }
 
 
-    @PostMapping(value ="postPayment")
+    @PostMapping(value = "postPayment")
     public PaymentResponse processPay2(@Valid @RequestBody PaymentRequest paymentRequest,
-                                      @RequestHeader("apiKey") String apiKey){
+                                       @RequestHeader("apiKey") String apiKey) {
 
         log.info("Request received -->" + paymentRequest);
         PaymentResponse response = paymentService.paymentProcessor(paymentRequest, apiKey);
