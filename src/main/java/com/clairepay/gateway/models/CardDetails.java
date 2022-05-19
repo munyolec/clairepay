@@ -1,4 +1,4 @@
-package com.clairepay.gateway.CardDetails;
+package com.clairepay.gateway.models;
 
 import lombok.Data;
 

@@ -1,12 +1,10 @@
-package com.clairepay.gateway.Payer;
+package com.clairepay.gateway.repository;
 
-import com.clairepay.gateway.Payments.Payments;
-import com.clairepay.gateway.Payments.PaymentsRepository;
+import com.clairepay.gateway.models.Payer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository

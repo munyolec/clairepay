@@ -1,6 +1,5 @@
-package com.clairepay.gateway.PaymentMethod;
+package com.clairepay.gateway.models;
 
-import com.clairepay.gateway.Payments.Payments;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;

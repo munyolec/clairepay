@@ -1,4 +1,4 @@
-package com.clairepay.gateway.Payer;
+package com.clairepay.gateway.validation;
 
 
 import javax.validation.Constraint;

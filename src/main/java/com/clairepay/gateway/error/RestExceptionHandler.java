@@ -32,6 +32,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         PaymentResponse paymentResponse = PaymentResponse.builder()
                 .responseCode(String.valueOf(ApiErrorCode.MISSING_PARAMETER.getCode()))
                 .responseDescription(message)
+                .requestId(ThreadLocalRequest.getRequestId())
                 .build();
         return new ResponseEntity<>(paymentResponse, HttpStatus.BAD_REQUEST);
     }
@@ -44,6 +45,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         PaymentResponse paymentResponse = PaymentResponse.builder()
                 .responseCode(String.valueOf(ApiErrorCode.UNREADABLE_MESSAGE.getCode()))
                 .responseDescription(message)
+                .requestId(ThreadLocalRequest.getRequestId())
                 .build();
         return new ResponseEntity<>(paymentResponse, HttpStatus.BAD_REQUEST);
     }
@@ -65,6 +67,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         PaymentResponse paymentResponse = PaymentResponse.builder()
                 .responseCode(String.valueOf(errorCode))
                 .responseDescription(message)
+                .requestId(ThreadLocalRequest.getRequestId())
                 .build();
         return new ResponseEntity<>(paymentResponse, HttpStatus.BAD_REQUEST);
     }

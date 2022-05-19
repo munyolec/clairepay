@@ -1,4 +1,4 @@
-package com.clairepay.gateway.Payments;
+package com.clairepay.gateway.service;
 
 import com.clairepay.gateway.dto.ChargeCard;
 import lombok.extern.slf4j.Slf4j;

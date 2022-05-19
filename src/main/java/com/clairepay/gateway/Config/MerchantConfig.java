@@ -1,7 +1,7 @@
-package com.clairepay.gateway.Merchant;
+package com.clairepay.gateway.Config;
 
-import com.clairepay.gateway.Payer.Payer;
-import com.clairepay.gateway.Payer.PayerRepository;
+import com.clairepay.gateway.models.Merchant;
+import com.clairepay.gateway.repository.MerchantRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

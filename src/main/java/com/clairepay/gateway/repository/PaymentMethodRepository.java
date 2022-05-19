@@ -1,6 +1,6 @@
-package com.clairepay.gateway.PaymentMethod;
+package com.clairepay.gateway.repository;
 
-import com.clairepay.gateway.Merchant.Merchant;
+import com.clairepay.gateway.models.PaymentMethod;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,5 +1,6 @@
-package com.clairepay.gateway.Payer;
+package com.clairepay.gateway.validation;
 
+import com.clairepay.gateway.repository.PayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.ConstraintValidator;

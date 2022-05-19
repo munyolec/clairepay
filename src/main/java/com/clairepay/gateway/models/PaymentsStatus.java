@@ -1,4 +1,4 @@
-package com.clairepay.gateway.Payments;
+package com.clairepay.gateway.models;
 
 public enum PaymentsStatus {
     SUCCESS,

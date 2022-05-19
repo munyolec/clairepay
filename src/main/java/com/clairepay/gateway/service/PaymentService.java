@@ -1,12 +1,15 @@
-package com.clairepay.gateway.Payments;
+package com.clairepay.gateway.service;
 
-import com.clairepay.gateway.Merchant.Merchant;
-import com.clairepay.gateway.Merchant.MerchantRepository;
-import com.clairepay.gateway.Payer.Payer;
-import com.clairepay.gateway.PaymentMethod.PaymentMethodRepository;
+import com.clairepay.gateway.models.Merchant;
+import com.clairepay.gateway.models.Payments;
+import com.clairepay.gateway.models.PaymentsStatus;
+import com.clairepay.gateway.repository.MerchantRepository;
+import com.clairepay.gateway.models.Payer;
+import com.clairepay.gateway.repository.PaymentMethodRepository;
+import com.clairepay.gateway.repository.PaymentsRepository;
 import com.clairepay.gateway.dto.PayerDTO;
-import com.clairepay.gateway.Payer.PayerRepository;
-import com.clairepay.gateway.PaymentMethod.PaymentMethod;
+import com.clairepay.gateway.repository.PayerRepository;
+import com.clairepay.gateway.models.PaymentMethod;
 import com.clairepay.gateway.dto.*;
 import com.clairepay.gateway.error.ApiErrorCode;
 import com.clairepay.gateway.error.InvalidParameterException;
@@ -133,7 +136,7 @@ public class PaymentService {
     }
 
     public void validateAmount(int amount) {
-        if (amount < 1) {
+        if ((amount < 1) && (amount < 0)) {
             throw new InvalidParameterException("Amount cannot be less than 1");
         }
         if (amount > 1_000_000) {
@@ -164,7 +167,7 @@ public class PaymentService {
     //*********================  PAYMENT PROCESSOR ========================************
     @Transactional
     public PaymentResponse paymentProcessor(PaymentRequest paymentRequest, String apiKey) {
-        //TODO: attempt to do db retryString requestId = ThreadLocalRequest.getRequestId();
+        //TODO: attempt to do db retry
         Payments payment = new Payments();
         PaymentResponse response = new PaymentResponse();
         PayerDTO getPayer = paymentRequest.getPayer();
@@ -250,8 +253,6 @@ public class PaymentService {
         validateAmount(paymentRequest.getAmount());
         payment.setAmount(paymentRequest.getAmount());
 
-
-        //TODO : successful payment response code
 
         int code = PAYMENT_SUCCESSFUL.getCode();
         response.setResponseCode(String.valueOf(code));

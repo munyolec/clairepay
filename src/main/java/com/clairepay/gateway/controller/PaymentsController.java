@@ -1,11 +1,9 @@
-package com.clairepay.gateway.Payments;
+package com.clairepay.gateway.controller;
 
 
-import com.clairepay.gateway.Merchant.MerchantRepository;
-import com.clairepay.gateway.Payer.PayerRepository;
+import com.clairepay.gateway.service.PaymentService;
 import com.clairepay.gateway.dto.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

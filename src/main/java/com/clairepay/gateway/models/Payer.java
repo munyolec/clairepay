@@ -1,7 +1,7 @@
-package com.clairepay.gateway.Payer;
+package com.clairepay.gateway.models;
 
 
-import com.clairepay.gateway.Payments.Payments;
+import com.clairepay.gateway.validation.UniqueEmail;
 import com.clairepay.gateway.dto.PayerDTO;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;

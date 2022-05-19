@@ -1,7 +1,6 @@
 package com.clairepay.gateway.dto;
 
-import com.clairepay.gateway.CardDetails.CardDetails;
-import com.clairepay.gateway.dto.PayerDTO;
+import com.clairepay.gateway.models.CardDetails;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;

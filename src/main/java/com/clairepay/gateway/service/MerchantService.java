@@ -1,5 +1,7 @@
-package com.clairepay.gateway.Merchant;
+package com.clairepay.gateway.service;
 
+import com.clairepay.gateway.models.Merchant;
+import com.clairepay.gateway.repository.MerchantRepository;
 import com.clairepay.gateway.dto.MerchantDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

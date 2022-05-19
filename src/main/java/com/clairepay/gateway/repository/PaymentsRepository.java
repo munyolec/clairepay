@@ -1,5 +1,6 @@
-package com.clairepay.gateway.Payments;
+package com.clairepay.gateway.repository;
 
+import com.clairepay.gateway.models.Payments;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

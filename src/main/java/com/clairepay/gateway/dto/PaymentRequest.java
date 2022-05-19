@@ -1,6 +1,5 @@
 package com.clairepay.gateway.dto;
 
-import com.clairepay.gateway.PaymentMethod.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -9,7 +8,6 @@ import javax.validation.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
