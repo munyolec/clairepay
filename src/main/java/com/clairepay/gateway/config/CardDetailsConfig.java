@@ -1,4 +1,4 @@
-package com.clairepay.gateway.Config;
+package com.clairepay.gateway.config;
 
 import com.clairepay.gateway.models.CardDetails;
 import com.clairepay.gateway.repository.CardDetailsRepository;

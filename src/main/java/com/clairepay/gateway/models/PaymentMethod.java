@@ -1,5 +1,7 @@
 package com.clairepay.gateway.models;
 
+import com.clairepay.gateway.dto.PayerDTO;
+import com.clairepay.gateway.dto.PaymentMethodDTO;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
@@ -32,6 +34,12 @@ public class PaymentMethod {
 
     public PaymentMethod(String methodName) {
         this.methodName = methodName;
+    }
+
+    public PaymentMethodDTO convertPaymentEntityToDTO() {
+        PaymentMethodDTO paymentMethodDTO = new PaymentMethodDTO();
+        paymentMethodDTO.setMethodName(this.getMethodName());
+        return paymentMethodDTO;
     }
 
 }

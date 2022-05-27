@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PayerService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gateway</a> &gt; <a href="index.source.html" class="el_package">com.clairepay.gateway.service</a> &gt; <span class="el_source">PayerService.java</span></div><h1>PayerService.java</h1><pre class="source lang-java linenums">package com.clairepay.gateway.service;
+
+import com.clairepay.gateway.models.Payer;
+import com.clairepay.gateway.repository.PayerRepository;
+import com.clairepay.gateway.dto.PayerDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class PayerService {
+
+    private final PayerRepository payerRepository;
+
+    @Autowired
+<span class="fc" id="L19">    public PayerService(PayerRepository payerRepository) {</span>
+<span class="fc" id="L20">        this.payerRepository = payerRepository;</span>
+<span class="fc" id="L21">    }</span>
+
+    public List&lt;PayerDTO&gt; getAllPayers() {
+<span class="fc" id="L24">        return payerRepository.findAll()</span>
+<span class="fc" id="L25">                .stream()</span>
+<span class="fc" id="L26">                .map(this::convertEntityToDTO)</span>
+<span class="fc" id="L27">                .collect(Collectors.toList());</span>
+    }
+
+
+    private PayerDTO convertEntityToDTO(Payer payer) {
+<span class="nc" id="L32">        PayerDTO payerDTO = new PayerDTO();</span>
+<span class="nc" id="L33">        payerDTO.setFirstName(payer.getFirstName());</span>
+<span class="nc" id="L34">        payerDTO.setLastName(payer.getLastName());</span>
+<span class="nc" id="L35">        payerDTO.setPhoneNumber(payer.getPhoneNumber());</span>
+<span class="nc" id="L36">        payerDTO.setEmail(payer.getEmail());</span>
+<span class="nc" id="L37">        return payerDTO;</span>
+    }
+
+
+    public Optional&lt;Payer&gt; getPayerByEmail(String email) {
+<span class="fc" id="L42">        return payerRepository.findByEmail(email);</span>
+    }
+
+    public Payer addNewPayer(Payer payer) {
+<span class="fc" id="L46">        return this.payerRepository.save(payer);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

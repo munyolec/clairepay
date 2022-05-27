@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentMethod.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gateway</a> &gt; <a href="index.source.html" class="el_package">com.clairepay.gateway.models</a> &gt; <span class="el_source">PaymentMethod.java</span></div><h1>PaymentMethod.java</h1><pre class="source lang-java linenums">package com.clairepay.gateway.models;
+
+import com.clairepay.gateway.dto.PayerDTO;
+import com.clairepay.gateway.dto.PaymentMethodDTO;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import lombok.Data;
+
+import javax.persistence.*;
+import java.util.List;
+
+
+<span class="pc bpc" id="L13" title="29 of 30 branches missed.">@Data</span>
+@Entity
+@Table
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,property=&quot;methodId&quot;)
+
+public class PaymentMethod {
+    @Id
+    @SequenceGenerator(name = &quot;paymentMethod_sequence&quot;,
+            sequenceName = &quot;paymentMethod_sequence&quot;,
+            allocationSize =1)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = &quot;paymentMethod_sequence&quot;
+    )
+<span class="fc" id="L27">    private Long methodId;</span>
+<span class="fc" id="L28">    private String methodName;</span>
+
+    @OneToMany(mappedBy=&quot;paymentMethod&quot;)
+<span class="nc" id="L31">    private List&lt;Payments&gt; payments;</span>
+
+<span class="fc" id="L33">    public PaymentMethod() {}</span>
+
+<span class="fc" id="L35">    public PaymentMethod(String methodName) {</span>
+<span class="fc" id="L36">        this.methodName = methodName;</span>
+<span class="fc" id="L37">    }</span>
+
+    public PaymentMethodDTO convertPaymentEntityToDTO() {
+<span class="fc" id="L40">        PaymentMethodDTO paymentMethodDTO = new PaymentMethodDTO();</span>
+<span class="fc" id="L41">        paymentMethodDTO.setMethodName(this.getMethodName());</span>
+<span class="fc" id="L42">        return paymentMethodDTO;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

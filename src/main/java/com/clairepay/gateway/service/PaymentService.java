@@ -86,7 +86,7 @@ public class PaymentService {
                 .collect(Collectors.toList());
     }
 
-    public void createMpesaQueue(String firstName, String lastName, String email, String phoneNumber, Integer amount) {
+    public void publishToMpesaQueue(String firstName, String lastName, String email, String phoneNumber, Integer amount) {
         MpesaQueue mpesaQueue = new MpesaQueue(
                 firstName, lastName, email, phoneNumber, amount
         );
@@ -125,18 +125,18 @@ public class PaymentService {
 
     public void validateCVV(int cvv) {
         if (String.valueOf(cvv).length() != 3) {
-            throw new InvalidParameterException("Invalid cvv ");
+            throw new InvalidParameterException("Invalid cvv");
         }
     }
 
     public void validateCardNumber(long cardNumber) {
         if (String.valueOf(cardNumber).length() < 7 || String.valueOf(cardNumber).length() > 12) {
-            throw new InvalidParameterException("Invalid card number ");
+            throw new InvalidParameterException("Invalid card number");
         }
     }
 
     public void validateAmount(int amount) {
-        if ((amount < 1) && (amount < 0)) {
+        if ((amount < 1)) {
             throw new InvalidParameterException("Amount cannot be less than 1");
         }
         if (amount > 1_000_000) {
@@ -156,12 +156,45 @@ public class PaymentService {
         }
     }
 
-    public void validateReferenceId(String referenceId){
+    public void validateReferenceId(String referenceId) {
         Optional<Payments> paymentOptional = paymentsRepository.findByReferenceId(referenceId);
-        if(paymentOptional.isPresent()){
+        if (paymentOptional.isPresent()) {
             throw new InvalidParameterException("duplicate reference id");
         }
     }
+
+    public Merchant validateMerchant(String apiKey1) {
+        Optional<Merchant> MerchantOptional = merchantRepository.findByApiKey(apiKey1);
+        if (MerchantOptional.isPresent()) {
+            return MerchantOptional.get();
+        } else {
+            throw new InvalidParameterException("merchant not found");
+        }
+    }
+
+    public Payer validatePayer(String email){
+        Optional<Payer> payerOptional = payerRepository.findByEmail(email);
+        return payerOptional.orElse(null);
+    }
+    public PaymentMethod validatePaymentMethod(String passedMethod) {
+        Optional<PaymentMethod> paymentMethodOptional = paymentMethodRepository.findByMethodNameIgnoreCase(passedMethod);
+        if (paymentMethodOptional.isPresent()) {
+            return paymentMethodOptional.get();
+        } else {
+            throw new InvalidParameterException("payment method not available");
+        }
+    }
+
+    public Card validateCard(Card card) {
+        validateCVV(card.getCvv());
+        validateCardNumber(card.getCardNumber());
+        validateYear(card.getExpiry().getYear());
+        validateExpiry(card.getExpiry().getYear(), card.getExpiry().getMonth());
+        return card;
+    }
+
+
+
 
 
     //*********================  PAYMENT PROCESSOR ========================************
@@ -175,16 +208,10 @@ public class PaymentService {
         response.setReferenceId(paymentRequest.getReferenceId());
 
         //check that merchant exists
-        Optional<Merchant> MerchantOptional = merchantRepository.findByApiKey(apiKey);
-        if (MerchantOptional.isPresent()) {
-            Merchant merchantFound = MerchantOptional.get();
-            payment.setMerchant(merchantFound);
-
-            //TODO : research on how to better update this data
-            merchantFound.setMerchantBalance((merchantFound.getMerchantBalance() + paymentRequest.getAmount()));
-        } else {
-            throw new InvalidParameterException("merchant not found");
-        }
+        Merchant merchantFound = validateMerchant(apiKey);
+        payment.setMerchant(merchantFound);
+        //TODO : research on how to better update this data
+        merchantFound.setMerchantBalance((merchantFound.getMerchantBalance() + paymentRequest.getAmount()));
 
         //validate currency & countries
         validateCurrency(paymentRequest.getCurrency());
@@ -195,17 +222,14 @@ public class PaymentService {
         if (paymentRequest.getPaymentMethod() == null) {
             throw new InvalidParameterException("payment method is required");
         }
-        String passedMethod = paymentRequest.getPaymentMethod().getMethodName();
-        Optional<PaymentMethod> paymentMethodOptional = paymentMethodRepository.findByMethodNameIgnoreCase(passedMethod);
-        if (paymentMethodOptional.isPresent()) {
-            payment.setPaymentMethod(paymentMethodOptional.get());
-        } else {
-            throw new InvalidParameterException("payment method not available");
-        }
 
-        //creating mpesa queue
+        //validate payment method and set
+        PaymentMethod methodExists = validatePaymentMethod(paymentRequest.getPaymentMethod().getMethodName());
+        payment.setPaymentMethod(methodExists);
+
+        //publishing to mpesa queue
         if ((paymentRequest.getPaymentMethod().getMethodName().equalsIgnoreCase("MobileMoney"))) {
-            createMpesaQueue(getPayer.getFirstName(), getPayer.getLastName(), getPayer.getEmail(),
+            publishToMpesaQueue(getPayer.getFirstName(), getPayer.getLastName(), getPayer.getEmail(),
                     getPayer.getPhoneNumber(), paymentRequest.getAmount());
         }
 
@@ -217,15 +241,10 @@ public class PaymentService {
             if (paymentRequest.getCard() != null) {
                 int month = paymentRequest.getCard().getExpiry().getMonth();
                 int year = paymentRequest.getCard().getExpiry().getYear();
-                //validate card
-                validateCVV(paymentRequest.getCard().getCvv());
-                validateCardNumber(paymentRequest.getCard().getCardNumber());
-                validateYear(year);
-                validateExpiry(year, month);
-
                 Expiry newExpiry = createExpiry(year, month);
                 Card card = createCard(getCard.getCvv(), getCard.getCardNumber(), newExpiry);
-                paymentRequest.setCard(card);
+                Card validatedCard = validateCard(card);
+                paymentRequest.setCard(validatedCard);
 
                 //call card API
                 ChargeCard chargeCard = new ChargeCard(
@@ -235,24 +254,22 @@ public class PaymentService {
                 consumeChargeCardService.callChargeCardAPI(chargeCard);
             }
         }
-
-//check if payer exists in database,get email, if new email value create a new payer
-        Optional<Payer> payerOptional = payerRepository.findByEmail(paymentRequest.getPayer().getEmail());
-        if (payerOptional.isPresent()) {
-            PayerDTO newPayer = new PayerDTO(payerOptional.get().getFirstName(), payerOptional.get().getLastName(),
-                    payerOptional.get().getEmail(), payerOptional.get().getPhoneNumber());
-            paymentRequest.setPayer(newPayer);
-            payment.setPayer(payerOptional.get());
-        } else {
+        //check if whether payer exists
+        Payer payerExists = validatePayer (paymentRequest.getPayer().getEmail());
+        if(payerExists!=null){
+            paymentRequest.setPayer(payerExists.convertPayerEntityToDTO());
+            payment.setPayer(payerExists);
+        }
+        else{
             Payer payerNew = createNewPayer(getPayer.getFirstName(), getPayer.getLastName(), getPayer.getEmail(),
                     getPayer.getPhoneNumber());
             paymentRequest.setPayer(paymentRequest.getPayer());
             payment.setPayer(payerNew);
         }
+
         //validate amount and set
         validateAmount(paymentRequest.getAmount());
         payment.setAmount(paymentRequest.getAmount());
-
 
         int code = PAYMENT_SUCCESSFUL.getCode();
         response.setResponseCode(String.valueOf(code));

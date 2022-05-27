@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CardDetailsConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gateway</a> &gt; <a href="index.source.html" class="el_package">com.clairepay.gateway.config</a> &gt; <span class="el_source">CardDetailsConfig.java</span></div><h1>CardDetailsConfig.java</h1><pre class="source lang-java linenums">package com.clairepay.gateway.config;
+
+import com.clairepay.gateway.models.CardDetails;
+import com.clairepay.gateway.repository.CardDetailsRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+
+import java.util.List;
+
+<span class="nc" id="L10">public class CardDetailsConfig {</span>
+    @Bean
+    CommandLineRunner commandLineRunnerCard(
+            CardDetailsRepository repository
+    ){
+<span class="nc" id="L15">        return args -&gt; {</span>
+<span class="nc" id="L16">            CardDetails one = new CardDetails(</span>
+                    &quot;222&quot;,
+                    &quot;12345678902423&quot;,
+                    &quot;05/22&quot;
+            );
+
+<span class="nc" id="L22">            CardDetails two = new CardDetails(</span>
+                    &quot;454&quot;,
+                    &quot;12345364743223&quot;,
+                    &quot;06/22&quot;
+
+            );
+
+<span class="nc" id="L29">            repository.saveAll(List.of(one, two));</span>
+<span class="nc" id="L30">        };</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

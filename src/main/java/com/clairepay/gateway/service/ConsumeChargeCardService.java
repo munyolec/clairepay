@@ -8,28 +8,25 @@ import org.springframework.http.HttpHeaders;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 
-@RestController
+@Service
 @Slf4j
 public class ConsumeChargeCardService {
+    private final RestTemplate restTemplate;
     @Autowired
-    RestTemplate restTemplate;
-
-    @RequestMapping(value = "/chargeCard/", method = RequestMethod.POST)
-    public void callChargeCardAPI(@RequestBody ChargeCard card) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        HttpEntity<ChargeCard> entity = new HttpEntity<ChargeCard>(card, headers);
-        log.info("Charge Card Response -> " + restTemplate.exchange(
-                "http://localhost:8081/api/v1/card/charge", HttpMethod.POST, entity, String.class).getBody());
-
+    public ConsumeChargeCardService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
+    public void callChargeCardAPI(ChargeCard card) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        HttpEntity<ChargeCard> entity = new HttpEntity<>(card, headers);
+        log.info("Charge Card Response -> " + restTemplate.exchange(
+                "http://localhost:8081/api/v1/card/charge", HttpMethod.POST, entity, String.class).getBody());
+    }
 }

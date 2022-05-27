@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,8 +38,8 @@ public class PayerService {
     }
 
 
-    public Boolean getPayerByEmail(String email) {
-        return payerRepository.selectExistsByEmail(email);
+    public Optional<Payer> getPayerByEmail(String email) {
+        return payerRepository.findByEmail(email);
     }
 
     public Payer addNewPayer(Payer payer) {

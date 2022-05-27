@@ -45,7 +45,4 @@ public class MerchantService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<Merchant> getMerchantPayments(String apiKey) {
-        return merchantRepository.findByApiKey(apiKey);
-    }
 }

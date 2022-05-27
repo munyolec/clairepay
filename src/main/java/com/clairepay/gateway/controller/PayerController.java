@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "api/v1/clairepay/payers")
@@ -19,13 +20,13 @@ public class PayerController {
         this.payerService = payerService;
     }
 
-    @GetMapping
+    @GetMapping(value ="/")
     public List<PayerDTO> getAllPayers() {
         return payerService.getAllPayers();
     }
 
     @GetMapping(path = "/{email}")
-    public Boolean getPayer(@PathVariable("email") String email) {
+    public Optional<Payer> getPayer(@PathVariable("email") String email) {
         return payerService.getPayerByEmail(email);
     }
 

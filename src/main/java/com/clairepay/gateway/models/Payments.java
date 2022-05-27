@@ -33,14 +33,11 @@ public class Payments {
     @ManyToOne
     @JoinColumn(name = "method_Id")
     private PaymentMethod paymentMethod;
-
     private String currency = "KES";
     private Integer amount;
     private String transactionId;
 
     private String referenceId;
-
-
     @Enumerated(EnumType.STRING)
     private PaymentsStatus status;
 

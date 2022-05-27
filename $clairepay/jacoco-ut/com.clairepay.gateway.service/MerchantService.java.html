@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MerchantService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gateway</a> &gt; <a href="index.source.html" class="el_package">com.clairepay.gateway.service</a> &gt; <span class="el_source">MerchantService.java</span></div><h1>MerchantService.java</h1><pre class="source lang-java linenums">package com.clairepay.gateway.service;
+
+import com.clairepay.gateway.models.Merchant;
+import com.clairepay.gateway.repository.MerchantRepository;
+import com.clairepay.gateway.dto.MerchantDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class MerchantService {
+
+    private final MerchantRepository merchantRepository;
+
+    @Autowired
+<span class="fc" id="L19">    public MerchantService(MerchantRepository merchantRepository) {</span>
+<span class="fc" id="L20">        this.merchantRepository = merchantRepository;</span>
+<span class="fc" id="L21">    }</span>
+
+    public List&lt;MerchantDTO&gt; getMerchantList() {
+<span class="fc" id="L24">       return merchantRepository.findAll()</span>
+<span class="fc" id="L25">               .stream()</span>
+<span class="fc" id="L26">               .map(this::convertEntityToDTO)</span>
+<span class="fc" id="L27">               .collect(Collectors.toList());</span>
+    }
+
+    private MerchantDTO convertEntityToDTO(Merchant merchant) {
+<span class="nc" id="L31">        MerchantDTO merchantDTO = new MerchantDTO();</span>
+<span class="nc" id="L32">        merchantDTO.setFirstName(merchant.getFirstName());</span>
+<span class="nc" id="L33">        merchantDTO.setLastName(merchant.getLastName());</span>
+<span class="nc" id="L34">        merchantDTO.setPhoneNumber(merchant.getPhoneNumber());</span>
+<span class="nc" id="L35">        merchantDTO.setEmail(merchant.getEmail());</span>
+<span class="nc" id="L36">        merchantDTO.setMerchantBalance(merchant.getMerchantBalance());</span>
+<span class="nc" id="L37">        return merchantDTO;</span>
+
+    }
+
+    public List&lt;MerchantDTO&gt; getMerchant(Long merchantId){
+<span class="fc" id="L42">        return merchantRepository.findById(merchantId)</span>
+<span class="fc" id="L43">                .stream()</span>
+<span class="fc" id="L44">                .map(this::convertEntityToDTO)</span>
+<span class="fc" id="L45">                .collect(Collectors.toList());</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

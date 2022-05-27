@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gateway</a> &gt; <a href="index.source.html" class="el_package">com.clairepay.gateway.service</a> &gt; <span class="el_source">PaymentService.java</span></div><h1>PaymentService.java</h1><pre class="source lang-java linenums">package com.clairepay.gateway.service;
+
+import com.clairepay.gateway.models.Merchant;
+import com.clairepay.gateway.models.Payments;
+import com.clairepay.gateway.models.PaymentsStatus;
+import com.clairepay.gateway.repository.MerchantRepository;
+import com.clairepay.gateway.models.Payer;
+import com.clairepay.gateway.repository.PaymentMethodRepository;
+import com.clairepay.gateway.repository.PaymentsRepository;
+import com.clairepay.gateway.dto.PayerDTO;
+import com.clairepay.gateway.repository.PayerRepository;
+import com.clairepay.gateway.models.PaymentMethod;
+import com.clairepay.gateway.dto.*;
+import com.clairepay.gateway.error.ApiErrorCode;
+import com.clairepay.gateway.error.InvalidParameterException;
+
+import com.clairepay.gateway.messaging.RabbitMQConfig;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.clairepay.gateway.error.ApiErrorCode.PAYMENT_SUCCESSFUL;
+
+@Service
+public class PaymentService {
+<span class="fc" id="L32">    private final List&lt;String&gt; ALLOWED_CURRENCIES = List.of(&quot;KES&quot;, &quot;USD&quot;, &quot;EUR&quot;);</span>
+<span class="fc" id="L33">    private final List&lt;String&gt; ALLOWED_COUNTRIES = List.of(&quot;KEN&quot;, &quot;UGA&quot;, &quot;TZA&quot;);</span>
+    private final PayerRepository payerRepository;
+    private final MerchantRepository merchantRepository;
+    private final PaymentsRepository paymentsRepository;
+    private final PaymentMethodRepository paymentMethodRepository;
+    private final RabbitTemplate template;
+    private final ConsumeChargeCardService consumeChargeCardService;
+
+    @Autowired
+    public PaymentService(PayerRepository payerRepository,
+                          MerchantRepository merchantRepository,
+                          PaymentsRepository paymentsRepository,
+                          PaymentMethodRepository paymentMethodRepository,
+<span class="fc" id="L46">                          RabbitTemplate template, ConsumeChargeCardService consumeChargeCardService) {</span>
+<span class="fc" id="L47">        this.payerRepository = payerRepository;</span>
+<span class="fc" id="L48">        this.merchantRepository = merchantRepository;</span>
+<span class="fc" id="L49">        this.paymentsRepository = paymentsRepository;</span>
+<span class="fc" id="L50">        this.paymentMethodRepository = paymentMethodRepository;</span>
+<span class="fc" id="L51">        this.template = template;</span>
+<span class="fc" id="L52">        this.consumeChargeCardService = consumeChargeCardService;</span>
+<span class="fc" id="L53">    }</span>
+
+    /**
+     * @return all payments
+     */
+    public List&lt;PaymentsDTO&gt; getAllPayments() {
+<span class="fc" id="L59">        return paymentsRepository.findAll()</span>
+<span class="fc" id="L60">                .stream()</span>
+<span class="fc" id="L61">                .map(this::convertEntityToDTO)</span>
+<span class="fc" id="L62">                .collect(Collectors.toList());</span>
+    }
+
+    /**
+     * @return paymentsDTO
+     */
+    private PaymentsDTO convertEntityToDTO(Payments payment) {
+<span class="nc" id="L69">        PaymentsDTO paymentsDTO = new PaymentsDTO();</span>
+<span class="nc" id="L70">        paymentsDTO.setPaymentId(payment.getPaymentId());</span>
+<span class="nc" id="L71">        paymentsDTO.setCurrency(payment.getCurrency());</span>
+<span class="nc" id="L72">        paymentsDTO.setAmount(String.valueOf(payment.getAmount()));</span>
+<span class="nc" id="L73">        paymentsDTO.setPaymentMethod(payment.getPaymentMethod().getMethodName());</span>
+<span class="nc" id="L74">        paymentsDTO.setPayer(payment.getPayer().convertPayerEntityToDTO());</span>
+<span class="nc" id="L75">        return paymentsDTO;</span>
+    }
+
+    /**
+     * return payments based on payerID
+     */
+
+    public List&lt;PaymentsDTO&gt; getPayerPayment(Long payerId) {
+<span class="fc" id="L83">        return paymentsRepository.findByPayerId(payerId)</span>
+<span class="fc" id="L84">                .stream()</span>
+<span class="fc" id="L85">                .map(this::convertEntityToDTO)</span>
+<span class="fc" id="L86">                .collect(Collectors.toList());</span>
+    }
+
+    public void publishToMpesaQueue(String firstName, String lastName, String email, String phoneNumber, Integer amount) {
+<span class="fc" id="L90">        MpesaQueue mpesaQueue = new MpesaQueue(</span>
+                firstName, lastName, email, phoneNumber, amount
+        );
+<span class="fc" id="L93">        template.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY, mpesaQueue);</span>
+<span class="fc" id="L94">    }</span>
+
+    public Payer createNewPayer(String firstName, String lastName, String email, String phoneNumber) {
+<span class="fc" id="L97">        Payer newPayer = new Payer(firstName, lastName, email, phoneNumber);</span>
+<span class="fc" id="L98">        payerRepository.save(newPayer);</span>
+<span class="fc" id="L99">        return newPayer;</span>
+    }
+
+    public Expiry createExpiry(int month, int year) {
+<span class="fc" id="L103">        return new Expiry(month, year);</span>
+    }
+
+    public Card createCard(int cvv, long cardNumber, Expiry expiry) {
+<span class="fc" id="L107">        return new Card(cvv, cardNumber, expiry);</span>
+    }
+
+    public void validateExpiry(int year, int month) {
+<span class="fc" id="L111">        LocalDate now = LocalDate.now();</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        if (year &lt; now.getYear()) {</span>
+<span class="fc" id="L113">            throw new InvalidParameterException(&quot;card has expired&quot;);</span>
+        }
+<span class="pc bpc" id="L115" title="1 of 4 branches missed.">        if (year == now.getYear() &amp;&amp; month &lt; now.getMonth().getValue()) {</span>
+<span class="fc" id="L116">            throw new InvalidParameterException(&quot;card has expired&quot;);</span>
+        }
+<span class="fc" id="L118">    }</span>
+
+    public void validateYear(int year) {
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        if (String.valueOf(year).length() != 4) {</span>
+<span class="fc" id="L122">            throw new InvalidParameterException(&quot;invalid year&quot;);</span>
+        }
+<span class="fc" id="L124">    }</span>
+
+    public void validateCVV(int cvv) {
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        if (String.valueOf(cvv).length() != 3) {</span>
+<span class="fc" id="L128">            throw new InvalidParameterException(&quot;Invalid cvv&quot;);</span>
+        }
+<span class="fc" id="L130">    }</span>
+
+    public void validateCardNumber(long cardNumber) {
+<span class="pc bpc" id="L133" title="1 of 4 branches missed.">        if (String.valueOf(cardNumber).length() &lt; 7 || String.valueOf(cardNumber).length() &gt; 12) {</span>
+<span class="fc" id="L134">            throw new InvalidParameterException(&quot;Invalid card number&quot;);</span>
+        }
+<span class="fc" id="L136">    }</span>
+
+    public void validateAmount(int amount) {
+<span class="fc bfc" id="L139" title="All 2 branches covered.">        if ((amount &lt; 1)) {</span>
+<span class="fc" id="L140">            throw new InvalidParameterException(&quot;Amount cannot be less than 1&quot;);</span>
+        }
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        if (amount &gt; 1_000_000) {</span>
+<span class="fc" id="L143">            throw new InvalidParameterException(&quot;Amount cannot be greater than 1 000 000&quot;);</span>
+        }
+<span class="fc" id="L145">    }</span>
+
+    public void validateCurrency(String currency) {
+<span class="fc bfc" id="L148" title="All 2 branches covered.">        if (!ALLOWED_CURRENCIES.contains(currency.toUpperCase())) {</span>
+<span class="fc" id="L149">            throw new InvalidParameterException(&quot;Currency not supported&quot;);</span>
+        }
+<span class="fc" id="L151">    }</span>
+
+    public void validateCountries(String country) {
+<span class="fc bfc" id="L154" title="All 2 branches covered.">        if (!ALLOWED_COUNTRIES.contains(country.toUpperCase())) {</span>
+<span class="fc" id="L155">            throw new InvalidParameterException(&quot;Country not supported&quot;);</span>
+        }
+<span class="fc" id="L157">    }</span>
+
+    public void validateReferenceId(String referenceId) {
+<span class="fc" id="L160">        Optional&lt;Payments&gt; paymentOptional = paymentsRepository.findByReferenceId(referenceId);</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">        if (paymentOptional.isPresent()) {</span>
+<span class="nc" id="L162">            throw new InvalidParameterException(&quot;duplicate reference id&quot;);</span>
+        }
+<span class="fc" id="L164">    }</span>
+
+    public Merchant validateMerchant(String apiKey1) {
+<span class="fc" id="L167">        Optional&lt;Merchant&gt; MerchantOptional = merchantRepository.findByApiKey(apiKey1);</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">        if (MerchantOptional.isPresent()) {</span>
+<span class="fc" id="L169">            return MerchantOptional.get();</span>
+        } else {
+<span class="fc" id="L171">            throw new InvalidParameterException(&quot;merchant not found&quot;);</span>
+        }
+    }
+
+    public PaymentMethod validatePaymentMethod(String passedMethod) {
+<span class="fc" id="L176">        Optional&lt;PaymentMethod&gt; paymentMethodOptional = paymentMethodRepository.findByMethodNameIgnoreCase(passedMethod);</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">        if (paymentMethodOptional.isPresent()) {</span>
+<span class="fc" id="L178">            return paymentMethodOptional.get();</span>
+        } else {
+<span class="fc" id="L180">            throw new InvalidParameterException(&quot;payment method not available&quot;);</span>
+        }
+    }
+
+    public Card validateCard(Card card) {
+<span class="fc" id="L185">        validateCVV(card.getCvv());</span>
+<span class="fc" id="L186">        validateCardNumber(card.getCardNumber());</span>
+<span class="fc" id="L187">        validateYear(card.getExpiry().getYear());</span>
+<span class="fc" id="L188">        validateExpiry(card.getExpiry().getYear(), card.getExpiry().getMonth());</span>
+<span class="fc" id="L189">        return card;</span>
+    }
+
+
+
+
+
+    //*********================  PAYMENT PROCESSOR ========================************
+    @Transactional
+    public PaymentResponse paymentProcessor(PaymentRequest paymentRequest, String apiKey) {
+        //TODO: attempt to do db retry
+<span class="fc" id="L200">        Payments payment = new Payments();</span>
+<span class="fc" id="L201">        PaymentResponse response = new PaymentResponse();</span>
+<span class="fc" id="L202">        PayerDTO getPayer = paymentRequest.getPayer();</span>
+<span class="fc" id="L203">        Card getCard = paymentRequest.getCard();</span>
+<span class="fc" id="L204">        response.setReferenceId(paymentRequest.getReferenceId());</span>
+
+        //check that merchant exists
+<span class="fc" id="L207">        Merchant merchantFound = validateMerchant(apiKey);</span>
+<span class="fc" id="L208">        payment.setMerchant(merchantFound);</span>
+        //TODO : research on how to better update this data
+<span class="fc" id="L210">        merchantFound.setMerchantBalance((merchantFound.getMerchantBalance() + paymentRequest.getAmount()));</span>
+
+        //validate currency &amp; countries
+<span class="fc" id="L213">        validateCurrency(paymentRequest.getCurrency());</span>
+<span class="fc" id="L214">        validateCountries(paymentRequest.getCountry());</span>
+
+        //TODO: SOLID - open closed principle
+        //check if payment method exists
+<span class="fc bfc" id="L218" title="All 2 branches covered.">        if (paymentRequest.getPaymentMethod() == null) {</span>
+<span class="fc" id="L219">            throw new InvalidParameterException(&quot;payment method is required&quot;);</span>
+        }
+
+        //validate payment method and set
+<span class="fc" id="L223">        PaymentMethod methodExists = validatePaymentMethod(paymentRequest.getPaymentMethod().getMethodName());</span>
+<span class="fc" id="L224">        payment.setPaymentMethod(methodExists);</span>
+
+        //publishing to mpesa queue
+<span class="fc bfc" id="L227" title="All 2 branches covered.">        if ((paymentRequest.getPaymentMethod().getMethodName().equalsIgnoreCase(&quot;MobileMoney&quot;))) {</span>
+<span class="fc" id="L228">            publishToMpesaQueue(getPayer.getFirstName(), getPayer.getLastName(), getPayer.getEmail(),</span>
+<span class="fc" id="L229">                    getPayer.getPhoneNumber(), paymentRequest.getAmount());</span>
+        }
+
+        //Require card information for Card Details and call charge card API
+<span class="fc bfc" id="L233" title="All 2 branches covered.">        if ((paymentRequest.getPaymentMethod().getMethodName().equalsIgnoreCase(&quot;card&quot;))) {</span>
+<span class="fc bfc" id="L234" title="All 2 branches covered.">            if (paymentRequest.getCard() == null) {</span>
+<span class="fc" id="L235">                throw new InvalidParameterException(&quot;card details required&quot;);</span>
+            }
+<span class="pc bpc" id="L237" title="1 of 2 branches missed.">            if (paymentRequest.getCard() != null) {</span>
+<span class="fc" id="L238">                int month = paymentRequest.getCard().getExpiry().getMonth();</span>
+<span class="fc" id="L239">                int year = paymentRequest.getCard().getExpiry().getYear();</span>
+<span class="fc" id="L240">                Expiry newExpiry = createExpiry(year, month);</span>
+<span class="fc" id="L241">                Card card = createCard(getCard.getCvv(), getCard.getCardNumber(), newExpiry);</span>
+<span class="fc" id="L242">                Card validatedCard = validateCard(card);</span>
+<span class="fc" id="L243">                paymentRequest.setCard(validatedCard);</span>
+
+                //call card API
+<span class="fc" id="L246">                ChargeCard chargeCard = new ChargeCard(</span>
+<span class="fc" id="L247">                        getPayer.getFirstName(), paymentRequest.getCurrency(), paymentRequest.getCountry(),</span>
+<span class="fc" id="L248">                        getPayer.getEmail(), getCard.getCardNumber(), getCard.getCvv(), newExpiry, paymentRequest.getAmount()</span>
+                );
+<span class="fc" id="L250">                consumeChargeCardService.callChargeCardAPI(chargeCard);</span>
+            }
+        }
+
+//check if payer exists in database,get email, if new email value create a new payer
+<span class="fc" id="L255">        Optional&lt;Payer&gt; payerOptional = payerRepository.findByEmail(paymentRequest.getPayer().getEmail());</span>
+<span class="pc bpc" id="L256" title="1 of 2 branches missed.">        if (payerOptional.isPresent()) {</span>
+<span class="nc" id="L257">            PayerDTO newPayer = new PayerDTO(payerOptional.get().getFirstName(), payerOptional.get().getLastName(),</span>
+<span class="nc" id="L258">                    payerOptional.get().getEmail(), payerOptional.get().getPhoneNumber());</span>
+<span class="nc" id="L259">            paymentRequest.setPayer(newPayer);</span>
+<span class="nc" id="L260">            payment.setPayer(payerOptional.get());</span>
+<span class="nc" id="L261">        } else {</span>
+<span class="fc" id="L262">            Payer payerNew = createNewPayer(getPayer.getFirstName(), getPayer.getLastName(), getPayer.getEmail(),</span>
+<span class="fc" id="L263">                    getPayer.getPhoneNumber());</span>
+<span class="fc" id="L264">            paymentRequest.setPayer(paymentRequest.getPayer());</span>
+<span class="fc" id="L265">            payment.setPayer(payerNew);</span>
+        }
+        //validate amount and set
+<span class="fc" id="L268">        validateAmount(paymentRequest.getAmount());</span>
+<span class="fc" id="L269">        payment.setAmount(paymentRequest.getAmount());</span>
+
+<span class="fc" id="L271">        int code = PAYMENT_SUCCESSFUL.getCode();</span>
+<span class="fc" id="L272">        response.setResponseCode(String.valueOf(code));</span>
+<span class="fc" id="L273">        response.setResponseDescription(ApiErrorCode.getDescription(code));</span>
+
+<span class="fc" id="L275">        validateReferenceId(response.getReferenceId());</span>
+<span class="fc" id="L276">        payment.setReferenceId(response.getReferenceId());</span>
+
+<span class="fc" id="L278">        payment.setTransactionId(response.getTransactionId());</span>
+<span class="fc" id="L279">        payment.setStatus(PaymentsStatus.SUCCESS);</span>
+
+<span class="fc" id="L281">        paymentsRepository.save(payment);</span>
+
+<span class="fc" id="L283">        return response;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

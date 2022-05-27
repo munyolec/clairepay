@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentRequest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gateway</a> &gt; <a href="index.source.html" class="el_package">com.clairepay.gateway.dto</a> &gt; <span class="el_source">PaymentRequest.java</span></div><h1>PaymentRequest.java</h1><pre class="source lang-java linenums">package com.clairepay.gateway.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+<span class="pc bpc" id="L12" title="45 of 62 branches missed.">@Data</span>
+<span class="fc" id="L13">@NoArgsConstructor</span>
+<span class="fc" id="L14">@AllArgsConstructor</span>
+<span class="fc" id="L15">@ToString</span>
+public class PaymentRequest {
+    @JsonProperty(&quot;reference_id&quot;)
+    @NotEmpty(message = &quot;reference id is required&quot;)
+<span class="fc" id="L19">    private String referenceId;</span>
+
+    @NotEmpty(message = &quot;country is required&quot;)
+    @Size(min = 3, max = 4)
+<span class="fc" id="L23">    private String country;</span>
+
+    @NotEmpty(message = &quot;currency is required&quot;)
+    @Size(min = 3, max = 4)
+<span class="fc" id="L27">    private String currency;</span>
+
+    @NotNull(message = &quot;amount is required&quot;)
+<span class="fc" id="L30">    private Integer amount;</span>
+
+    @Valid
+<span class="fc" id="L33">    private PaymentMethodDTO paymentMethod;</span>
+
+    @Valid
+<span class="fc" id="L36">    private PayerDTO payer;</span>
+
+    @Valid
+<span class="fc" id="L39">    private Card card;</span>
+
+
+<span class="fc" id="L42">    public PaymentRequest(String referenceId, String country, String currency, Integer amount, PayerDTO payer, Card card) {</span>
+<span class="fc" id="L43">        this.referenceId = referenceId;</span>
+<span class="fc" id="L44">        this.country = country;</span>
+<span class="fc" id="L45">        this.currency = currency;</span>
+<span class="fc" id="L46">        this.amount = amount;</span>
+<span class="fc" id="L47">        this.payer = payer;</span>
+<span class="fc" id="L48">        this.card = card;</span>
+<span class="fc" id="L49">    }</span>
+
+<span class="fc" id="L51">    public PaymentRequest(String referenceId, String country, String currency, Integer amount, PaymentMethodDTO paymentMethod, PayerDTO payer) {</span>
+<span class="fc" id="L52">        this.referenceId = referenceId;</span>
+<span class="fc" id="L53">        this.country = country;</span>
+<span class="fc" id="L54">        this.currency = currency;</span>
+<span class="fc" id="L55">        this.amount = amount;</span>
+<span class="fc" id="L56">        this.paymentMethod = paymentMethod;</span>
+<span class="fc" id="L57">        this.payer = payer;</span>
+<span class="fc" id="L58">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

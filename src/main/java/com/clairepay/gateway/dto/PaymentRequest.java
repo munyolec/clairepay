@@ -30,7 +30,6 @@ public class PaymentRequest {
     private Integer amount;
 
     @Valid
-//    @NotEmpty(message="payment is required")
     private PaymentMethodDTO paymentMethod;
 
     @Valid
@@ -39,5 +38,23 @@ public class PaymentRequest {
     @Valid
     private Card card;
 
+
+    public PaymentRequest(String referenceId, String country, String currency, Integer amount, PayerDTO payer, Card card) {
+        this.referenceId = referenceId;
+        this.country = country;
+        this.currency = currency;
+        this.amount = amount;
+        this.payer = payer;
+        this.card = card;
+    }
+
+    public PaymentRequest(String referenceId, String country, String currency, Integer amount, PaymentMethodDTO paymentMethod, PayerDTO payer) {
+        this.referenceId = referenceId;
+        this.country = country;
+        this.currency = currency;
+        this.amount = amount;
+        this.paymentMethod = paymentMethod;
+        this.payer = payer;
+    }
 }
 
