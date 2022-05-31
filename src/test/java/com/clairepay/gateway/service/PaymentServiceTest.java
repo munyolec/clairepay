@@ -26,13 +26,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.hamcrest.Matchers.any;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-//@SpringBootTest
 class PaymentServiceTest {
     @Mock private PayerRepository payerRepository;
     @Mock private PaymentsRepository paymentsRepository;
@@ -40,7 +40,7 @@ class PaymentServiceTest {
     @Mock private PaymentMethodRepository paymentMethodRepository;
     @Mock private  RabbitTemplate rabbitTemplate;
     @Mock private ConsumeChargeCardService consumeChargeCardService;
-    @Autowired
+
     private PaymentService paymentServiceUnderTest;
 
     @BeforeEach
@@ -50,6 +50,8 @@ class PaymentServiceTest {
                         this.paymentMethodRepository, this.rabbitTemplate, this.consumeChargeCardService);
 
     }
+
+
 
 
     @Test

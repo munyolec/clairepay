@@ -1,5 +1,6 @@
 package com.clairepay.gateway.repository;
 
+import com.clairepay.gateway.AbstractTest;
 import com.clairepay.gateway.models.Merchant;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +13,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class MerchantRepositoryTest {
+class MerchantRepositoryTest extends AbstractTest {
 
     @Autowired
     private MerchantRepository merchantRepositoryUnderTest;
@@ -24,7 +25,7 @@ class MerchantRepositoryTest {
     }
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
     }
 
     @Test

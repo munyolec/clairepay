@@ -1,7 +1,9 @@
 package com.clairepay.gateway.controller;
 
+import com.clairepay.gateway.AbstractTest;
 import com.clairepay.gateway.dto.PayerDTO;
 import com.clairepay.gateway.models.Payer;
+import com.clairepay.gateway.repository.PayerRepository;
 import com.clairepay.gateway.service.PayerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,13 +41,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-class PayerControllerTest {
+@WebMvcTest(controllers = PayerController.class)
+class PayerControllerTest extends AbstractTest {
 
     @MockBean
     private PayerService payerService;
 
-//    @Autowired
+    @MockBean
+    private PayerRepository payerRepository;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired

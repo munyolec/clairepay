@@ -1,20 +1,22 @@
 package com.clairepay.gateway.repository;
 
+import com.clairepay.gateway.AbstractTest;
 import com.clairepay.gateway.models.Payer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@SpringBootTest
-class PayerRepositoryTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+//@Testcontainers
+class PayerRepositoryTest  {
     @Autowired
     private PayerRepository payerRepositoryUnderTest;
 
@@ -24,7 +26,7 @@ class PayerRepositoryTest {
     }
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
     }
 
     @Test

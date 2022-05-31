@@ -10,8 +10,6 @@ import java.util.Optional;
 @Repository
 public interface MerchantRepository extends JpaRepository<Merchant, Long> {
 
-
-
     Optional<Merchant> findByApiKey(String apiKey);
 
     @Query("SELECT m FROM Merchant m WHERE m.merchantId = ?1")

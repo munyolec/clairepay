@@ -1,5 +1,6 @@
 package com.clairepay.gateway.service;
 
+import com.clairepay.gateway.AbstractTest;
 import com.clairepay.gateway.models.Merchant;
 import com.clairepay.gateway.models.Payer;
 import com.clairepay.gateway.repository.MerchantRepository;
@@ -15,13 +16,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class MerchantServiceTest {
+class MerchantServiceTest  {
     @Mock
     private MerchantRepository merchantRepository;
     private MerchantService merchantServiceUnderTest;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         this.merchantServiceUnderTest = new MerchantService(this.merchantRepository);
     }
 
