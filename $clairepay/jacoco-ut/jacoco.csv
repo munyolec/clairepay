@@ -18,12 +18,12 @@ gateway,com.clairepay.gateway.dto,MpesaQueue,258,22,46,0,13,2,39,1,16,1
 gateway,com.clairepay.gateway.service,MerchantService,26,29,0,0,7,11,1,3,1,3
 gateway,com.clairepay.gateway.service,ConsumeChargeCardService,34,10,0,0,6,4,1,2,1,2
 gateway,com.clairepay.gateway.service,PayerService,22,28,0,0,6,9,1,4,1,4
-gateway,com.clairepay.gateway.service,PaymentService,63,498,5,35,13,116,6,34,1,19
+gateway,com.clairepay.gateway.service,PaymentService,42,506,5,35,10,118,6,35,1,20
 gateway,com.clairepay.gateway.config,CardDetailsConfig,27,0,0,0,6,0,3,0,3,0
 gateway,com.clairepay.gateway.config,PaymentMethodsConfig,0,23,0,0,0,6,0,3,0,3
 gateway,com.clairepay.gateway.config,MerchantConfig,0,31,0,0,0,6,0,3,0,3
 gateway,com.clairepay.gateway.config,PayerConfig,0,29,0,0,0,6,0,3,0,3
-gateway,com.clairepay.gateway.validation,UniqueEmailValidator,2,14,2,2,1,3,2,2,0,2
+gateway,com.clairepay.gateway.validation,UniqueEmailValidator,2,14,1,3,1,3,1,3,0,2
 gateway,com.clairepay.gateway.error,InvalidParameterException,0,4,0,0,0,2,0,1,0,1
 gateway,com.clairepay.gateway.error,RestExceptionHandler,106,9,7,1,32,2,8,2,4,2
 gateway,com.clairepay.gateway.error,ApiErrorCode,2,65,1,3,1,12,1,5,0,4

@@ -13,7 +13,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class MerchantRepositoryTest extends AbstractTest {
+class MerchantRepositoryTest  {
 
     @Autowired
     private MerchantRepository merchantRepositoryUnderTest;

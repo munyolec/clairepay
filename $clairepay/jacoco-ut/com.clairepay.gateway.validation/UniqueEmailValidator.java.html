@@ -12,7 +12,7 @@ import javax.validation.ConstraintValidatorContext;
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-<span class="pc bpc" id="L15" title="2 of 4 branches missed.">        if (payerRepository != null &amp;&amp; payerRepository.findByEmail(value).isPresent()) {</span>
+<span class="pc bpc" id="L15" title="1 of 4 branches missed.">        if (payerRepository != null &amp;&amp; payerRepository.findByEmail(value).isPresent()) {</span>
 <span class="nc" id="L16">            return false;</span>
         }
 <span class="fc" id="L18">        return true;</span>
